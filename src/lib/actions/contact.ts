@@ -11,7 +11,7 @@ export async function getContact(): Promise<Contact | null> {
         createdAt: 'desc',
       },
     })
-    return contact
+    return contact as Contact;
   } catch (error) {
     console.error('Error fetching contact:', error)
     return null
@@ -23,7 +23,8 @@ export async function createOrUpdateContact(data: ContactFormData): Promise<ApiR
     // First check if contact record exists
     const existingContact = await db.contact.findFirst()
 
-    let contact: Contact
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let contact: any;
 
     if (existingContact) {
       // Update existing record
@@ -38,7 +39,7 @@ export async function createOrUpdateContact(data: ContactFormData): Promise<ApiR
           state: data.state,
           zipCode: data.zipCode,
           country: data.country,
-          socialLinks: data.socialLinks,
+          socialLinks: data.socialLinks as Record<string, string>,
         },
       })
     } else {
@@ -53,7 +54,7 @@ export async function createOrUpdateContact(data: ContactFormData): Promise<ApiR
           state: data.state,
           zipCode: data.zipCode,
           country: data.country,
-          socialLinks: data.socialLinks,
+          socialLinks: data.socialLinks as Record<string, string>,
         },
       })
     }
