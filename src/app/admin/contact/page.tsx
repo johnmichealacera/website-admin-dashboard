@@ -167,7 +167,7 @@ export default function ContactPage() {
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
-                  value={formData.phone}
+                  value={formData.phone || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                   placeholder="(555) 123-4567"
                 />
@@ -177,7 +177,7 @@ export default function ContactPage() {
                 <Label htmlFor="address">Street Address</Label>
                 <Input
                   id="address"
-                  value={formData.address}
+                  value={formData.address || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                   placeholder="123 Main Street"
                 />
@@ -188,7 +188,7 @@ export default function ContactPage() {
                   <Label htmlFor="city">City</Label>
                   <Input
                     id="city"
-                    value={formData.city}
+                    value={formData.city || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
                     placeholder="City"
                   />
@@ -198,7 +198,7 @@ export default function ContactPage() {
                   <Label htmlFor="state">State</Label>
                   <Input
                     id="state"
-                    value={formData.state}
+                    value={formData.state || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
                     placeholder="State"
                   />
@@ -208,7 +208,7 @@ export default function ContactPage() {
                   <Label htmlFor="zipCode">ZIP Code</Label>
                   <Input
                     id="zipCode"
-                    value={formData.zipCode}
+                    value={formData.zipCode || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, zipCode: e.target.value }))}
                     placeholder="12345"
                   />
@@ -218,7 +218,7 @@ export default function ContactPage() {
                   <Label htmlFor="country">Country</Label>
                   <Input
                     id="country"
-                    value={formData.country}
+                    value={formData.country || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
                     placeholder="Country"
                   />
