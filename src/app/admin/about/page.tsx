@@ -150,7 +150,7 @@ export default function AboutPage() {
                   <Label htmlFor="mission">Mission Statement</Label>
                   <Textarea
                     id="mission"
-                    value={formData.mission}
+                    value={formData.mission || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, mission: e.target.value }))}
                     placeholder="Your mission statement..."
                     rows={3}
@@ -161,7 +161,7 @@ export default function AboutPage() {
                   <Label htmlFor="vision">Vision Statement</Label>
                   <Textarea
                     id="vision"
-                    value={formData.vision}
+                    value={formData.vision || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, vision: e.target.value }))}
                     placeholder="Your vision statement..."
                     rows={3}
