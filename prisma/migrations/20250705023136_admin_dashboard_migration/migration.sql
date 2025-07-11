@@ -47,7 +47,7 @@ CREATE TABLE "contact" (
     "phone" TEXT,
     "address" TEXT,
     "city" TEXT,
-    "state" TEXT,
+    "province" TEXT,
     "zipCode" TEXT,
     "country" TEXT,
     "socialLinks" JSONB,

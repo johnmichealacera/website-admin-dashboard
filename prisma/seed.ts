@@ -172,10 +172,10 @@ async function main() {
       email: 'hello@thriftedshoes.com',
       phone: '(555) 123-4567',
       address: '123 Thrift Street',
-      city: 'Portland',
-      state: 'Oregon',
+      city: 'Manticao',
+      province: 'Misamis Oriental',
       zipCode: '97201',
-      country: 'United States',
+      country: 'Philippines',
       socialLinks: {
         instagram: 'https://instagram.com/thriftedshoes',
         facebook: 'https://facebook.com/thriftedshoes',

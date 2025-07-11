@@ -38,7 +38,7 @@ export interface Contact {
   phone: string | null
   address: string | null
   city: string | null
-  state: string | null
+  province: string | null
   zipCode: string | null
   country: string | null
   socialLinks: Record<string, string> | null // JSON type for social media links

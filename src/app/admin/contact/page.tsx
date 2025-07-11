@@ -20,7 +20,7 @@ export default function ContactPage() {
     phone: '',
     address: '',
     city: '',
-    state: '',
+    province: '',
     zipCode: '',
     country: '',
     socialLinks: {},
@@ -41,7 +41,7 @@ export default function ContactPage() {
         phone: data.phone || '',
         address: data.address || '',
         city: data.city || '',
-        state: data.state || '',
+        province: data.province || '',
         zipCode: data.zipCode || '',
         country: data.country || '',
         socialLinks: data.socialLinks || {},
@@ -63,7 +63,7 @@ export default function ContactPage() {
         phone: contact.phone || '',
         address: contact.address || '',
         city: contact.city || '',
-        state: contact.state || '',
+        province: contact.province || '',
         zipCode: contact.zipCode || '',
         country: contact.country || '',
         socialLinks: contact.socialLinks || {},
@@ -195,12 +195,12 @@ export default function ContactPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="state">State</Label>
+                  <Label htmlFor="province">Province</Label>
                   <Input
-                    id="state"
-                    value={formData.state || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
-                    placeholder="State"
+                    id="province"
+                    value={formData.province || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, province: e.target.value }))}
+                    placeholder="Province"
                   />
                 </div>
 
@@ -303,7 +303,7 @@ export default function ContactPage() {
                         {contact.city && (
                           <p>
                             {contact.city}
-                            {contact.state && `, ${contact.state}`}
+                            {contact.province && `, ${contact.province}`}
                             {contact.zipCode && ` ${contact.zipCode}`}
                           </p>
                         )}
