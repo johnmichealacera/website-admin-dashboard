@@ -46,6 +46,31 @@ export interface Contact {
   updatedAt: Date
 }
 
+export interface Event {
+  id: string
+  title: string
+  description: string | null
+  startDate: Date
+  endDate: Date | null
+  location: string | null
+  address: string | null
+  city: string | null
+  province: string | null
+  zipCode: string | null
+  country: string | null
+  price: number | null
+  maxAttendees: number | null
+  imageUrls: string[]
+  isActive: boolean
+  isFeatured: boolean
+  tags: string[]
+  contactEmail: string | null
+  contactPhone: string | null
+  websiteUrl: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 // Extended types with relations
 export type ProductWithCategory = Product & {
   category: Category
@@ -63,6 +88,8 @@ export type CategoryFormData = Omit<Category, 'id' | 'createdAt' | 'updatedAt'>
 export type AboutFormData = Omit<About, 'id' | 'createdAt' | 'updatedAt'>
 
 export type ContactFormData = Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>
+
+export type EventFormData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
 
 // API Response types
 export interface ApiResponse<T> {

@@ -11,7 +11,8 @@ import {
   Home, 
   Menu, 
   X,
-  BarChart3
+  BarChart3,
+  Calendar
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -24,6 +25,7 @@ const navItems = [
   { href: '/admin', icon: Home, label: 'Dashboard' },
   { href: '/admin/products', icon: Package, label: 'Products' },
   { href: '/admin/categories', icon: Tags, label: 'Categories' },
+  { href: '/admin/events', icon: Calendar, label: 'Events' },
   { href: '/admin/about', icon: FileText, label: 'About Us' },
   { href: '/admin/contact', icon: Phone, label: 'Contact Info' },
 ]
