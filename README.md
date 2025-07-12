@@ -1,11 +1,12 @@
-# Thrift Store Admin Dashboard
+# Business Admin Dashboard
 
-A modern, full-stack admin dashboard for managing thrift store inventory, categories, and business information. Built with Next.js 14, TypeScript, Prisma, PostgreSQL, and TailwindCSS.
+A modern, full-stack admin dashboard for managing business inventory, categories, events, and business information. Built with Next.js 14, TypeScript, Prisma, PostgreSQL, and TailwindCSS.
 
 ## 🚀 Features
 
 - **Product Management**: Add, edit, delete, and manage product inventory
 - **Category Management**: Organize products into categories with descriptions
+- **Event Management**: Create and manage business events with dates, locations, and attendee limits
 - **Business Information**: Update About Us and Contact information
 - **Dashboard Analytics**: View inventory statistics and low stock alerts
 - **Responsive Design**: Mobile-friendly interface with modern UI
@@ -87,6 +88,29 @@ The application uses the following database models:
 - `description` - Category description (optional)
 - `createdAt` / `updatedAt` - Timestamps
 
+### Event
+- `id` - Unique identifier
+- `title` - Event title
+- `description` - Event description (optional)
+- `startDate` - Event start date and time
+- `endDate` - Event end date and time (optional)
+- `location` - Event venue (optional)
+- `address` - Street address (optional)
+- `city` - City (optional)
+- `province` - Province/state (optional)
+- `zipCode` - ZIP code (optional)
+- `country` - Country (optional)
+- `price` - Event price (defaults to 0)
+- `maxAttendees` - Maximum attendees (optional)
+- `imageUrls` - Array of image URLs
+- `isActive` - Event status
+- `isFeatured` - Featured event flag
+- `tags` - Array of event tags
+- `contactEmail` - Event contact email (optional)
+- `contactPhone` - Event contact phone (optional)
+- `websiteUrl` - Event website URL (optional)
+- `createdAt` / `updatedAt` - Timestamps
+
 ### About
 - `id` - Unique identifier
 - `title` - About section title
@@ -129,6 +153,16 @@ The application uses the following database models:
 - Delete categories (only if no products are assigned)
 - View category overview with product counts
 
+### Event Management
+- Create new events with dates, locations, and pricing
+- Edit existing events with comprehensive details
+- Delete events (with confirmation)
+- View events in a responsive card layout
+- Track event status (active/inactive) and featured events
+- Manage event attendee limits and contact information
+- Add event tags for better organization
+- View past, current, and upcoming events
+
 ### Business Information
 - Update About Us information including mission, vision, and values
 - Manage contact details and social media links
@@ -142,6 +176,7 @@ src/
 │   ├── admin/             # Admin dashboard pages
 │   │   ├── products/      # Product management
 │   │   ├── categories/    # Category management
+│   │   ├── events/        # Event management
 │   │   ├── about/         # About Us management
 │   │   └── contact/       # Contact management
 │   └── globals.css        # Global styles
@@ -178,6 +213,15 @@ The application uses Next.js Server Actions for data operations:
 - `updateCategory(id, data)` - Update existing category
 - `deleteCategory(id)` - Delete category
 
+### Event Actions
+- `getEvents()` - Fetch all events
+- `getEventById(id)` - Fetch single event
+- `createEvent(data)` - Create new event
+- `updateEvent(id, data)` - Update existing event
+- `deleteEvent(id)` - Delete event
+- `getFeaturedEvents()` - Get featured events
+- `getUpcomingEvents()` - Get upcoming events
+
 ### About Actions
 - `getAbout()` - Fetch about information
 - `createOrUpdateAbout(data)` - Create or update about information
@@ -201,6 +245,7 @@ The application uses Next.js Server Actions for data operations:
 ### Form Components
 - `ProductForm` - Product creation/editing form
 - `CategoryForm` - Category creation/editing form
+- `EventForm` - Event creation/editing form with comprehensive fields
 
 ### Layout Components
 - `AdminLayout` - Main admin layout with sidebar navigation
@@ -287,4 +332,4 @@ If you encounter any issues or have questions:
 
 ---
 
-Built with ❤️ for thrift store management
+Built with ❤️ for business management

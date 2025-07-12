@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Thrifty Shoes Admin Dashboard",
-  description: "Thrifty Shoes Admin Dashboard",
+  title: "Local Business Admin Dashboard",
+  description: "Local Business Admin Dashboard",
 };
 
 export default function RootLayout({
