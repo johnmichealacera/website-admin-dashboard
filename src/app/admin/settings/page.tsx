@@ -8,25 +8,9 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Settings, Package, Shield, Building2, AlertCircle, Save, Loader2 } from 'lucide-react'
 import { useTenant } from '@/contexts/tenant-context'
-import { SitePackage, SiteFeature, SitePackageFormData } from '@/lib/types'
+import { SitePackage, SiteFeature, SitePackageFormData, SitePackageInfo } from '@/lib/types'
 import { updateSitePackage, getSitePackageInfo, getAllSitesPackageInfo } from '@/lib/actions/site-settings'
 import { PACKAGE_FEATURES } from '@/lib/utils/site-features'
-
-interface SitePackageInfo {
-  id: string
-  name: string
-  domain?: string
-  packageType: SitePackage
-  features: SiteFeature[]
-  isActive: boolean
-  updatedAt: Date
-  _count?: {
-    users: number
-    products: number
-    categories: number
-    events: number
-  }
-}
 
 export default function SiteSettingsPage() {
   const { currentUser, currentSite } = useTenant()
@@ -54,7 +38,7 @@ export default function SiteSettingsPage() {
     setLoading(true)
     const result = await getAllSitesPackageInfo()
     if (result.success) {
-      setAllSites(result.sites)
+      setAllSites(result.sites as SitePackageInfo[])
     } else {
       setError(result.error || 'Failed to load sites')
     }
@@ -64,11 +48,11 @@ export default function SiteSettingsPage() {
   const loadSitePackageInfo = async (siteId: string) => {
     const result = await getSitePackageInfo(siteId)
     if (result.success) {
-      const site = result.site
-      setSelectedSite(site)
+      const site: SitePackageInfo | undefined = result.site
+      setSelectedSite(site || null)
       setFormData({
-        packageType: site.packageType,
-        features: site.features
+        packageType: site?.packageType as SitePackage,
+        features: site?.features as SiteFeature[]
       })
     } else {
       setError(result.error || 'Failed to load site package info')
@@ -80,8 +64,8 @@ export default function SiteSettingsPage() {
     if (site) {
       setSelectedSite(site)
       setFormData({
-        packageType: site.packageType,
-        features: site.features
+        packageType: site.packageType as SitePackage,
+        features: site.features as SiteFeature[]
       })
     }
   }
@@ -222,7 +206,7 @@ export default function SiteSettingsPage() {
                   <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500">
                     <span>{site._count?.users || 0} users</span>
                     <span>{site._count?.products || 0} products</span>
-                    <span>{site.features.length} features</span>
+                    <span>{site?.features?.length} features</span>
                   </div>
                 </button>
               ))}

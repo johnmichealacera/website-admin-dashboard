@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { SitePackageUpdateData } from '@/lib/types'
+import { SitePackageUpdateData, SitePackageInfo } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
 export async function updateSitePackage(data: SitePackageUpdateData) {
@@ -40,7 +40,7 @@ export async function getSitePackageInfo(siteId: string) {
       return { success: false, error: 'Site not found' }
     }
 
-    return { success: true, site }
+    return { success: true, site: site as SitePackageInfo }
   } catch (error) {
     console.error('Error fetching site package info:', error)
     return { success: false, error: 'Failed to fetch site package info' }

@@ -4,6 +4,23 @@ export enum UserRole {
   ADMIN = 'ADMIN'
 }
 
+
+export interface SitePackageInfo {
+  id: string
+  name: string
+  domain?: string
+  packageType?: SitePackage
+  features?: SiteFeature[]
+  isActive?: boolean
+  updatedAt: Date
+  _count?: {
+    users: number
+    products: number
+    categories: number
+    events: number
+  }
+}
+
 export enum SiteRole {
   ADMIN = 'ADMIN',
   EDITOR = 'EDITOR',
