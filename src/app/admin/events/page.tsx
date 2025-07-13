@@ -7,7 +7,6 @@ import { EventForm } from '@/components/forms/event-form'
 import { Plus, Calendar, Edit, Trash2, MapPin, Clock, Users, PhilippinePeso, Star } from 'lucide-react'
 import { Event } from '@/lib/types'
 import { getEvents, deleteEvent } from '@/lib/actions/events'
-import { formatDate } from '@/lib/utils'
 import { useTenant } from '@/contexts/tenant-context'
 
 export default function EventsPage() {

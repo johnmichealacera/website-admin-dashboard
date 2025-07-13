@@ -23,6 +23,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
   const { currentSite } = useTenant()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<EventFormData>({
+    siteId: currentSite?.id || '',
     title: initialData?.title || '',
     description: initialData?.description || '',
     startDate: initialData?.startDate || new Date(),

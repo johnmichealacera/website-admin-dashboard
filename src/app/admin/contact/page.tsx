@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Phone, Loader2, Mail, MapPin, Globe } from 'lucide-react'
+import { Phone, Loader2, Mail, Globe } from 'lucide-react'
 import { Contact, ContactFormData } from '@/lib/types'
 import { getContact, createOrUpdateContact } from '@/lib/actions/contact'
 import { useTenant } from '@/contexts/tenant-context'
@@ -17,6 +17,7 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState<ContactFormData>({
+    siteId: currentSite?.id || '',
     businessName: '',
     email: '',
     phone: '',
@@ -42,6 +43,7 @@ export default function ContactPage() {
     setContact(data)
     if (data) {
       setFormData({
+        siteId: currentSite?.id || '',
         businessName: data.businessName,
         email: data.email,
         phone: data.phone || '',
@@ -64,6 +66,7 @@ export default function ContactPage() {
     setIsEditing(false)
     if (contact) {
       setFormData({
+        siteId: currentSite?.id || '',
         businessName: contact.businessName,
         email: contact.email,
         phone: contact.phone || '',
