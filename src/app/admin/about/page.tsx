@@ -18,6 +18,7 @@ export default function AboutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState<AboutFormData>({
+    siteId: currentSite?.id || '',
     title: '',
     content: '',
     mission: '',
@@ -39,6 +40,7 @@ export default function AboutPage() {
     setAbout(data)
     if (data) {
       setFormData({
+        siteId: currentSite?.id || '',
         title: data.title,
         content: data.content,
         mission: data.mission || '',
@@ -57,6 +59,7 @@ export default function AboutPage() {
     setIsEditing(false)
     if (about) {
       setFormData({
+        siteId: currentSite?.id || '',
         title: about.title,
         content: about.content,
         mission: about.mission || '',
