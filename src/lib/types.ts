@@ -39,6 +39,7 @@ export enum SiteFeature {
   PRODUCTS = 'PRODUCTS',
   CATEGORIES = 'CATEGORIES',
   EVENTS = 'EVENTS',
+  EVENT_SERVICES = 'EVENT_SERVICES',
   ABOUT = 'ABOUT',
   CONTACT = 'CONTACT'
 }
@@ -155,6 +156,34 @@ export interface Event {
   updatedAt: Date
 }
 
+export interface EventService {
+  id: string
+  name: string
+  description: string | null
+  basePrice: number | null
+  imageUrls: string[]
+  isActive: boolean
+  isFeatured: boolean
+  category: string | null
+  duration: string | null
+  inclusions: string[]
+  addOns: EventServiceAddOn[] | null
+  freebies: string[]
+  contactEmail: string | null
+  contactPhone: string | null
+  bookingUrl: string | null
+  tags: string[]
+  siteId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface EventServiceAddOn {
+  name: string
+  price: number
+  description?: string
+}
+
 // Extended types with relations
 export type ProductWithCategory = Product & {
   category: Category
@@ -182,6 +211,8 @@ export type AboutFormData = Omit<About, 'id' | 'createdAt' | 'updatedAt'>
 export type ContactFormData = Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>
 
 export type EventFormData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
+
+export type EventServiceFormData = Omit<EventService, 'id' | 'createdAt' | 'updatedAt'>
 
 export type SiteFormData = Omit<Site, 'id' | 'createdAt' | 'updatedAt'>
 

@@ -17,6 +17,7 @@ import {
   X,
   BarChart3,
   Calendar,
+  Sparkles,
   LogOut,
   User,
   Settings
@@ -34,6 +35,7 @@ const navItems = [
   { href: '/admin/products', icon: Package, label: 'Products', feature: SiteFeature.PRODUCTS },
   { href: '/admin/categories', icon: Tags, label: 'Categories', feature: SiteFeature.CATEGORIES },
   { href: '/admin/events', icon: Calendar, label: 'Events', feature: SiteFeature.EVENTS },
+  { href: '/admin/event-services', icon: Sparkles, label: 'Event Services', feature: SiteFeature.EVENT_SERVICES },
   { href: '/admin/about', icon: FileText, label: 'About Us', feature: SiteFeature.ABOUT },
   { href: '/admin/contact', icon: Phone, label: 'Contact Info', feature: SiteFeature.CONTACT },
   { href: '/admin/settings', icon: Settings, label: 'Site Settings', feature: null, superAdminOnly: true },

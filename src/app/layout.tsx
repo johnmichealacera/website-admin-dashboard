@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Auth0Provider } from '@auth0/nextjs-auth0';
 import { TenantProvider } from '@/contexts/tenant-context';
-import { DebugAuth } from '@/components/debug-auth';
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,7 +32,6 @@ export default function RootLayout({
       >
         <Auth0Provider>
           <TenantProvider>
-            <DebugAuth />
             {children}
           </TenantProvider>
         </Auth0Provider>

@@ -36,7 +36,7 @@ async function main() {
       description: 'Sustainable fashion and accessories store',
       isActive: true,
       packageType: 'PREMIUM',
-      features: ['DASHBOARD', 'PRODUCTS', 'CATEGORIES', 'EVENTS', 'ABOUT']
+      features: ['DASHBOARD', 'PRODUCTS', 'CATEGORIES', 'EVENTS', 'EVENT_SERVICES', 'ABOUT']
     },
   })
 
@@ -48,7 +48,7 @@ async function main() {
       description: 'Refurbished electronics and tech accessories',
       isActive: true,
       packageType: 'ENTERPRISE',
-      features: ['DASHBOARD', 'PRODUCTS', 'CATEGORIES', 'EVENTS', 'ABOUT', 'CONTACT']
+      features: ['DASHBOARD', 'PRODUCTS', 'CATEGORIES', 'EVENTS', 'EVENT_SERVICES', 'ABOUT', 'CONTACT']
     },
   })
 
@@ -406,6 +406,142 @@ async function main() {
   })
 
   console.log('📞 Created contact information for enterprise site')
+
+  // Create Event Services for Premium and Enterprise sites
+  const eventServices = await Promise.all([
+    // Premium site event services
+    prisma.eventService.create({
+      data: {
+        name: 'Classic Wedding Package',
+        description: 'The Classic Wedding Package includes professional hair and makeup styling for the bride and groom on the wedding day, plus beautiful finishing touches and accessories to complete the look.',
+        basePrice: 15000,
+        category: 'Wedding',
+        duration: 'Full Day',
+        inclusions: [
+          'HD Makeup for Bride and Groom',
+          'Commercial Hairstyling',
+          '3 Different Looks: Preparation, Ceremony, and Reception',
+          'Retouch Throughout the Event',
+          'Beauty Assistant'
+        ],
+        addOns: [
+          { name: 'Hair Extensions & Contact Lenses', price: 1000, description: 'Premium hair extensions and colored contact lenses' },
+          { name: 'Extra Head (Hair & Makeup)', price: 2000, description: 'Additional person for hair and makeup services' }
+        ],
+        freebies: [
+          'Accessories (Earrings and Hair Accessories)'
+        ],
+        tags: ['wedding', 'bridal', 'makeup', 'hair'],
+        isActive: true,
+        isFeatured: true,
+        contactEmail: 'wedding@greenfashion.com',
+        contactPhone: '+63 9XX XXX XXXX',
+        siteId: site2.id,
+      },
+    }),
+    prisma.eventService.create({
+      data: {
+        name: 'Premium Wedding Package',
+        description: 'The Premium Wedding Package covers everything from your prenup to your wedding day, with complete HD makeup, styling, and full beauty assistance for a flawless, worry-free experience.',
+        basePrice: 25000,
+        category: 'Wedding',
+        duration: 'Prenup + Wedding Day',
+        inclusions: [
+          'HD Makeup for Bride and Groom',
+          'Commercial Hairstyling',
+          '3 Layouts',
+          'Unlimited Retouch',
+          'Beauty Assistant',
+          'Contact Lenses and Hair Extensions',
+          '2 Heads Traditional Hair and Makeup'
+        ],
+        addOns: [
+          { name: 'Additional Prenup Look', price: 3000, description: 'Extra styling for prenup shoot' },
+          { name: 'Bridal Party Makeup', price: 1500, description: 'Per person makeup for bridal party' }
+        ],
+        freebies: [
+          'Accessories (Earrings and Hair Accessories)',
+          'Touch-up Kit',
+          'Bridal Robe'
+        ],
+        tags: ['wedding', 'prenup', 'premium', 'bridal'],
+        isActive: true,
+        isFeatured: true,
+        contactEmail: 'premium@greenfashion.com',
+        contactPhone: '+63 9XX XXX XXXX',
+        siteId: site2.id,
+      },
+    }),
+    // Enterprise site event services
+    prisma.eventService.create({
+      data: {
+        name: 'Corporate Event Photography',
+        description: 'Professional photography services for corporate events, conferences, and business gatherings with high-quality equipment and experienced photographers.',
+        basePrice: 20000,
+        category: 'Corporate',
+        duration: '8 Hours',
+        inclusions: [
+          'Professional Photographer',
+          'High-Resolution Digital Photos',
+          'Event Coverage Documentation',
+          'Basic Photo Editing',
+          'Online Gallery Access'
+        ],
+        addOns: [
+          { name: 'Second Photographer', price: 8000, description: 'Additional photographer for comprehensive coverage' },
+          { name: 'Same Day Editing', price: 5000, description: 'Quick turnaround edited photos' },
+          { name: 'Printed Photo Album', price: 3000, description: 'Professional photo album' }
+        ],
+        freebies: [
+          'USB Drive with All Photos',
+          'Basic Slideshow'
+        ],
+        tags: ['corporate', 'photography', 'business', 'events'],
+        isActive: true,
+        isFeatured: true,
+        contactEmail: 'corporate@techexchange.com',
+        contactPhone: '+63 9XX XXX XXXX',
+        bookingUrl: 'https://techexchange.com/book-photography',
+        siteId: site3.id,
+      },
+    }),
+    prisma.eventService.create({
+      data: {
+        name: 'Tech Conference Setup',
+        description: 'Complete technical setup and support for conferences, including audio-visual equipment, live streaming, and technical assistance throughout the event.',
+        basePrice: 35000,
+        category: 'Corporate',
+        duration: 'Full Day Setup + Event',
+        inclusions: [
+          'Audio-Visual Equipment Setup',
+          'Live Streaming Setup',
+          'Technical Support Staff',
+          'Microphone and Speaker Systems',
+          'Projection and Display Setup',
+          'Recording Equipment'
+        ],
+        addOns: [
+          { name: 'Multi-Camera Live Stream', price: 15000, description: 'Professional multi-angle live streaming' },
+          { name: 'Interactive Presentation Tools', price: 8000, description: 'Advanced presentation technology' },
+          { name: 'Post-Event Video Editing', price: 10000, description: 'Professional video editing services' }
+        ],
+        freebies: [
+          'Basic Technical Rehearsal',
+          'Equipment Backup',
+          'Technical Documentation'
+        ],
+        tags: ['tech', 'conference', 'audio-visual', 'streaming'],
+        isActive: true,
+        isFeatured: false,
+        contactEmail: 'tech@techexchange.com',
+        contactPhone: '+63 9XX XXX XXXX',
+        bookingUrl: 'https://techexchange.com/book-tech-setup',
+        siteId: site3.id,
+      },
+    })
+  ])
+
+  console.log('✨ Created event services for premium and enterprise sites')
 
   console.log('✅ Multi-tenant seed completed successfully!')
   console.log('\n📊 Summary:')

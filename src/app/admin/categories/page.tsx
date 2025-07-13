@@ -17,12 +17,8 @@ export default function CategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<CategoryWithProducts | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (currentSite?.id) {
-      loadCategories()
-    }
-  }, [currentSite?.id])
-
+  // Load categories for the current site
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const loadCategories = async () => {
     if (!currentSite?.id) return
     
@@ -31,6 +27,14 @@ export default function CategoriesPage() {
     setCategories(data)
     setLoading(false)
   }
+
+  // Load categories when the current site changes
+  useEffect(() => {
+    if (currentSite?.id) {
+      loadCategories()
+    }
+  }, [currentSite?.id, loadCategories])
+
 
   const handleAddCategory = () => {
     setEditingCategory(null)
