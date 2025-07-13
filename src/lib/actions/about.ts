@@ -30,7 +30,7 @@ export async function createOrUpdateAbout(data: AboutFormData, siteId: string): 
       },
     })
 
-    let about: About
+    let about: About | null = null
 
     if (existingAbout) {
       // Update existing record
@@ -80,7 +80,7 @@ export async function createOrUpdateAbout(data: AboutFormData, siteId: string): 
 
     return {
       success: true,
-      data: about,
+      data: about as About,
     }
   } catch (error) {
     console.error('Error creating/updating about:', error)

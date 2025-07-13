@@ -22,6 +22,7 @@ export function CategoryForm({ initialData, categoryId, onSuccess, onCancel }: C
   const { currentSite } = useTenant()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<CategoryFormData>({
+    siteId: currentSite?.id || '',
     name: initialData?.name || '',
     description: initialData?.description || '',
   })

@@ -28,6 +28,7 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
   const [isUploading, setIsUploading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [formData, setFormData] = useState<ProductFormData>({
+    siteId: currentSite?.id || '',
     name: initialData?.name || '',
     description: initialData?.description || '',
     price: initialData?.price || 0,
@@ -52,7 +53,7 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
     if (!currentSite?.id) return
     
     const data = await getCategoriesSimple(currentSite.id)
-    setCategories(data)
+    setCategories(data as Category[])
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,9 +161,8 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
             <div className="space-y-2">
               <Label htmlFor="category">Category *</Label>
               <Select
-                id="category"
                 value={formData.categoryId}
-                onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, categoryId: value }))}
                 required
               >
                 <option value="">Select a category</option>
