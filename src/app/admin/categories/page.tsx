@@ -8,20 +8,26 @@ import { Plus, Tags, Edit, Trash2 } from 'lucide-react'
 import { CategoryWithProducts } from '@/lib/types'
 import { getCategories, deleteCategory } from '@/lib/actions/categories'
 import { formatDate } from '@/lib/utils'
+import { useTenant } from '@/contexts/tenant-context'
 
 export default function CategoriesPage() {
+  const { currentSite } = useTenant()
   const [categories, setCategories] = useState<CategoryWithProducts[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState<CategoryWithProducts | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadCategories()
-  }, [])
+    if (currentSite?.id) {
+      loadCategories()
+    }
+  }, [currentSite?.id])
 
   const loadCategories = async () => {
+    if (!currentSite?.id) return
+    
     setLoading(true)
-    const data = await getCategories()
+    const data = await getCategories(currentSite.id)
     setCategories(data)
     setLoading(false)
   }
@@ -37,11 +43,13 @@ export default function CategoriesPage() {
   }
 
   const handleDeleteCategory = async (id: string) => {
+    if (!currentSite?.id) return
+    
     if (!confirm('Are you sure you want to delete this category?')) {
       return
     }
 
-    const result = await deleteCategory(id)
+    const result = await deleteCategory(id, currentSite.id)
     if (result.success) {
       loadCategories()
     } else {
@@ -58,6 +66,23 @@ export default function CategoriesPage() {
   const handleFormCancel = () => {
     setShowForm(false)
     setEditingCategory(null)
+  }
+
+  // Show message if no site is selected
+  if (!currentSite) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <Tags className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No Site Selected
+          </h3>
+          <p className="text-gray-600">
+            Please select a site to manage categories.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   if (showForm) {
@@ -88,7 +113,7 @@ export default function CategoriesPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
           <p className="text-sm text-gray-500">
-            Manage your product categories
+            Manage your product categories for {currentSite.name}
           </p>
         </div>
         <Button onClick={handleAddCategory}>
@@ -125,18 +150,34 @@ export default function CategoriesPage() {
               </Button>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4">
               {categories.map((category) => (
                 <Card key={category.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-2">
+                  <CardContent className="p-6">
                     <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{category.name}</CardTitle>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {category.products.length} products
-                        </p>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {category.name}
+                          </h3>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {category.products.length} products
+                          </span>
+                        </div>
+                        
+                        {category.description && (
+                          <p className="text-gray-600 mb-3">
+                            {category.description}
+                          </p>
+                        )}
+                        
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <span>Created: {formatDate(new Date(category.createdAt))}</span>
+                          <span>Updated: {formatDate(new Date(category.updatedAt))}</span>
+                        </div>
                       </div>
-                      <div className="flex space-x-1">
+                      
+                      <div className="flex items-center space-x-2">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -153,21 +194,6 @@ export default function CategoriesPage() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {category.description && (
-                      <p className="text-sm text-gray-600 mb-3">
-                        {category.description}
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>Created {formatDate(new Date(category.createdAt))}</span>
-                      {category.products.length > 0 && (
-                        <span className="text-orange-600">
-                          Has products
-                        </span>
-                      )}
                     </div>
                   </CardContent>
                 </Card>

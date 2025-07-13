@@ -8,20 +8,26 @@ import { Plus, Calendar, Edit, Trash2, MapPin, Clock, Users, PhilippinePeso, Sta
 import { Event } from '@/lib/types'
 import { getEvents, deleteEvent } from '@/lib/actions/events'
 import { formatDate } from '@/lib/utils'
+import { useTenant } from '@/contexts/tenant-context'
 
 export default function EventsPage() {
+  const { currentSite } = useTenant()
   const [events, setEvents] = useState<Event[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadEvents()
-  }, [])
+    if (currentSite?.id) {
+      loadEvents()
+    }
+  }, [currentSite?.id])
 
   const loadEvents = async () => {
+    if (!currentSite?.id) return
+    
     setLoading(true)
-    const data = await getEvents()
+    const data = await getEvents(currentSite.id)
     setEvents(data)
     setLoading(false)
   }
@@ -37,11 +43,13 @@ export default function EventsPage() {
   }
 
   const handleDeleteEvent = async (id: string) => {
+    if (!currentSite?.id) return
+    
     if (!confirm('Are you sure you want to delete this event?')) {
       return
     }
 
-    const result = await deleteEvent(id)
+    const result = await deleteEvent(id, currentSite.id)
     if (result.success) {
       loadEvents()
     } else {
@@ -77,6 +85,23 @@ export default function EventsPage() {
     return eventDate.toDateString() === today.toDateString()
   }
 
+  // Show message if no site is selected
+  if (!currentSite) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No Site Selected
+          </h3>
+          <p className="text-gray-600">
+            Please select a site to manage events.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   if (showForm) {
     return (
       <div className="space-y-6">
@@ -105,7 +130,7 @@ export default function EventsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Events</h1>
           <p className="text-sm text-gray-500">
-            Manage your business events and activities
+            Manage your business events and activities for {currentSite.name}
           </p>
         </div>
         <Button onClick={handleAddEvent}>
@@ -178,79 +203,75 @@ export default function EventsPage() {
                                 }
                               </span>
                             </div>
-
+                            
                             {event.description && (
-                              <p className="text-gray-600 mb-3 line-clamp-2">
+                              <p className="text-gray-600 mb-3">
                                 {event.description}
                               </p>
                             )}
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
-                              <div className="flex items-center">
-                                <Clock className="h-4 w-4 mr-1 text-gray-400" />
-                                <span>{formatEventDate(event.startDate)}</span>
+                            
+                            <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
+                              <div className="flex items-center space-x-2">
+                                <Clock className="h-4 w-4" />
+                                <span>
+                                  {formatEventDate(event.startDate)}
+                                  {event.endDate && ` - ${formatEventDate(event.endDate)}`}
+                                </span>
                               </div>
-
+                              
                               {event.location && (
-                                <div className="flex items-center">
-                                  <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-                                  <span className="truncate">{event.location}</span>
+                                <div className="flex items-center space-x-2">
+                                  <MapPin className="h-4 w-4" />
+                                  <span>{event.location}</span>
                                 </div>
                               )}
-
-                              {event.price !== null && event.price > 0 && (
-                                <div className="flex items-center">
-                                  <PhilippinePeso className="h-4 w-4 mr-1 text-gray-400" />
-                                  <span>{event.price}</span>
+                              
+                              {event.price && event.price > 0 && (
+                                <div className="flex items-center space-x-2">
+                                  <PhilippinePeso className="h-4 w-4" />
+                                  <span>₱{event.price.toFixed(2)}</span>
                                 </div>
                               )}
-
+                              
                               {event.maxAttendees && (
-                                <div className="flex items-center">
-                                  <Users className="h-4 w-4 mr-1 text-gray-400" />
+                                <div className="flex items-center space-x-2">
+                                  <Users className="h-4 w-4" />
                                   <span>Max {event.maxAttendees} attendees</span>
                                 </div>
                               )}
                             </div>
-
+                            
                             {event.tags.length > 0 && (
                               <div className="flex flex-wrap gap-1 mt-3">
                                 {event.tags.map((tag, index) => (
                                   <span
                                     key={index}
-                                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                                   >
                                     {tag}
                                   </span>
                                 ))}
                               </div>
                             )}
-
-                            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                              <span className="text-sm text-gray-500">
-                                Created {formatDate(new Date(event.createdAt))}
-                              </span>
-                              
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEditEvent(event)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDeleteEvent(event.id)}
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
                           </div>
                         </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditEvent(event)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteEvent(event.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </CardContent>

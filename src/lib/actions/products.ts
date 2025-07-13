@@ -4,9 +4,12 @@ import { db } from '@/lib/db'
 import { ProductFormData, ProductWithCategory, ApiResponse } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
-export async function getProducts(): Promise<ProductWithCategory[]> {
+export async function getProducts(siteId: string): Promise<ProductWithCategory[]> {
   try {
     const products = await db.product.findMany({
+      where: {
+        siteId: siteId,
+      },
       include: {
         category: true,
       },
@@ -21,10 +24,13 @@ export async function getProducts(): Promise<ProductWithCategory[]> {
   }
 }
 
-export async function getProductById(id: string): Promise<ProductWithCategory | null> {
+export async function getProductById(id: string, siteId: string): Promise<ProductWithCategory | null> {
   try {
     const product = await db.product.findUnique({
-      where: { id },
+      where: { 
+        id,
+        siteId: siteId,
+      },
       include: {
         category: true,
       },
@@ -36,7 +42,7 @@ export async function getProductById(id: string): Promise<ProductWithCategory | 
   }
 }
 
-export async function createProduct(data: ProductFormData): Promise<ApiResponse<ProductWithCategory>> {
+export async function createProduct(data: ProductFormData, siteId: string): Promise<ApiResponse<ProductWithCategory>> {
   try {
     const product = await db.product.create({
       data: {
@@ -47,6 +53,7 @@ export async function createProduct(data: ProductFormData): Promise<ApiResponse<
         imageUrls: data.imageUrls,
         isActive: data.isActive,
         categoryId: data.categoryId,
+        siteId: siteId,
       },
       include: {
         category: true,
@@ -69,10 +76,13 @@ export async function createProduct(data: ProductFormData): Promise<ApiResponse<
   }
 }
 
-export async function updateProduct(id: string, data: Partial<ProductFormData>): Promise<ApiResponse<ProductWithCategory>> {
+export async function updateProduct(id: string, data: Partial<ProductFormData>, siteId: string): Promise<ApiResponse<ProductWithCategory>> {
   try {
     const product = await db.product.update({
-      where: { id },
+      where: { 
+        id,
+        siteId: siteId,
+      },
       data: {
         ...(data.name && { name: data.name }),
         ...(data.description !== undefined && { description: data.description }),
@@ -103,10 +113,13 @@ export async function updateProduct(id: string, data: Partial<ProductFormData>):
   }
 }
 
-export async function deleteProduct(id: string): Promise<ApiResponse<null>> {
+export async function deleteProduct(id: string, siteId: string): Promise<ApiResponse<void>> {
   try {
     await db.product.delete({
-      where: { id },
+      where: { 
+        id,
+        siteId: siteId,
+      },
     })
 
     revalidatePath('/admin/products')
@@ -124,14 +137,14 @@ export async function deleteProduct(id: string): Promise<ApiResponse<null>> {
   }
 }
 
-export async function getLowStockProducts(): Promise<ProductWithCategory[]> {
+export async function getLowStockProducts(siteId: string): Promise<ProductWithCategory[]> {
   try {
     const products = await db.product.findMany({
       where: {
+        siteId: siteId,
         stock: {
           lt: 5,
         },
-        isActive: true,
       },
       include: {
         category: true,
@@ -144,5 +157,64 @@ export async function getLowStockProducts(): Promise<ProductWithCategory[]> {
   } catch (error) {
     console.error('Error fetching low stock products:', error)
     return []
+  }
+}
+
+export async function getProductsStats(siteId: string): Promise<{
+  totalProducts: number
+  lowStockProducts: number
+  totalInventoryValue: number
+  activeProducts: number
+}> {
+  try {
+    const [totalProducts, lowStockProducts, allProducts, activeProducts] = await Promise.all([
+      db.product.count({
+        where: {
+          siteId: siteId,
+        },
+      }),
+      db.product.count({
+        where: {
+          siteId: siteId,
+          stock: {
+            lt: 5,
+          },
+        },
+      }),
+      db.product.findMany({
+        where: {
+          siteId: siteId,
+        },
+        select: {
+          price: true,
+          stock: true,
+        },
+      }),
+      db.product.count({
+        where: {
+          siteId: siteId,
+          isActive: true,
+        },
+      }),
+    ])
+
+    const totalInventoryValue = allProducts.reduce((sum, product) => {
+      return sum + (product.price * product.stock)
+    }, 0)
+
+    return {
+      totalProducts,
+      lowStockProducts,
+      totalInventoryValue,
+      activeProducts,
+    }
+  } catch (error) {
+    console.error('Error fetching product stats:', error)
+    return {
+      totalProducts: 0,
+      lowStockProducts: 0,
+      totalInventoryValue: 0,
+      activeProducts: 0,
+    }
   }
 } 

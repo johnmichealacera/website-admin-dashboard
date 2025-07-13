@@ -9,8 +9,10 @@ import { Label } from '@/components/ui/label'
 import { FileText, Loader2 } from 'lucide-react'
 import { About, AboutFormData } from '@/lib/types'
 import { getAbout, createOrUpdateAbout } from '@/lib/actions/about'
+import { useTenant } from '@/contexts/tenant-context'
 
 export default function AboutPage() {
+  const { currentSite } = useTenant()
   const [about, setAbout] = useState<About | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -24,12 +26,16 @@ export default function AboutPage() {
   })
 
   useEffect(() => {
-    loadAbout()
-  }, [])
+    if (currentSite?.id) {
+      loadAbout()
+    }
+  }, [currentSite?.id])
 
   const loadAbout = async () => {
+    if (!currentSite?.id) return
+    
     setLoading(true)
-    const data = await getAbout()
+    const data = await getAbout(currentSite.id)
     setAbout(data)
     if (data) {
       setFormData({
@@ -62,10 +68,16 @@ export default function AboutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!currentSite?.id) {
+      alert('No site selected')
+      return
+    }
+    
     setIsSubmitting(true)
 
     try {
-      const result = await createOrUpdateAbout(formData)
+      const result = await createOrUpdateAbout(formData, currentSite.id)
       if (result.success) {
         setIsEditing(false)
         loadAbout()
@@ -82,6 +94,23 @@ export default function AboutPage() {
   const handleValuesChange = (value: string) => {
     const values = value.split('\n').map(v => v.trim()).filter(v => v.length > 0)
     setFormData(prev => ({ ...prev, values }))
+  }
+
+  // Show message if no site is selected
+  if (!currentSite) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No Site Selected
+          </h3>
+          <p className="text-gray-600">
+            Please select a site to manage about information.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
@@ -101,7 +130,7 @@ export default function AboutPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">About Us</h1>
           <p className="text-sm text-gray-500">
-            Manage your business information
+            Manage your business information for {currentSite.name}
           </p>
         </div>
         {!isEditing && (
@@ -116,7 +145,7 @@ export default function AboutPage() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <FileText className="h-5 w-5 mr-2" />
-            Business Information
+            About Information
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -128,19 +157,19 @@ export default function AboutPage() {
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="e.g., About Thrifted Shoes Apparel"
+                  placeholder="Enter title"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="content">Main Content *</Label>
+                <Label htmlFor="content">Content *</Label>
                 <Textarea
                   id="content"
                   value={formData.content}
                   onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  placeholder="Tell your business story..."
-                  rows={5}
+                  placeholder="Enter your business story and information..."
+                  rows={6}
                   required
                 />
               </div>

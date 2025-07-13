@@ -13,6 +13,8 @@ import { createProduct, updateProduct } from '@/lib/actions/products'
 import { Loader2, Upload, X } from 'lucide-react'
 import { handleFileChange } from "@jmacera/cloudinary-image-upload";
 import Image from 'next/image'
+import { useTenant } from '@/contexts/tenant-context'
+
 interface ProductFormProps {
   initialData?: Partial<ProductFormData>
   productId?: string
@@ -21,6 +23,7 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ initialData, productId, onSuccess, onCancel }: ProductFormProps) {
+  const { currentSite } = useTenant()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
@@ -40,22 +43,32 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
   const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY
 
   useEffect(() => {
-    loadCategories()
-  }, [])
+    if (currentSite?.id) {
+      loadCategories()
+    }
+  }, [currentSite?.id])
 
   const loadCategories = async () => {
-    const data = await getCategoriesSimple()
+    if (!currentSite?.id) return
+    
+    const data = await getCategoriesSimple(currentSite.id)
     setCategories(data)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!currentSite?.id) {
+      alert('No site selected')
+      return
+    }
+    
     setIsSubmitting(true)
 
     try {
       const result = productId 
-        ? await updateProduct(productId, formData)
-        : await createProduct(formData)
+        ? await updateProduct(productId, formData, currentSite.id)
+        : await createProduct(formData, currentSite.id)
 
       if (result.success) {
         onSuccess?.()
@@ -112,6 +125,17 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
     }))
   }
 
+  // Show message if no site is selected
+  if (!currentSite) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <p className="text-gray-500">No site selected. Please select a site to continue.</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -164,12 +188,11 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">Price (₱) *</Label>
+              <Label htmlFor="price">Price *</Label>
               <Input
                 id="price"
                 type="number"
                 step="0.01"
-                min="0"
                 value={formData.price}
                 onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
                 placeholder="0.00"
@@ -182,7 +205,6 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
               <Input
                 id="stock"
                 type="number"
-                min="0"
                 value={formData.stock}
                 onChange={(e) => setFormData(prev => ({ ...prev, stock: parseInt(e.target.value) || 0 }))}
                 placeholder="0"

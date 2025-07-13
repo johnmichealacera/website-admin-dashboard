@@ -4,9 +4,12 @@ import { db } from '@/lib/db'
 import { CategoryFormData, CategoryWithProducts, ApiResponse } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
-export async function getCategories(): Promise<CategoryWithProducts[]> {
+export async function getCategories(siteId: string): Promise<CategoryWithProducts[]> {
   try {
     const categories = await db.category.findMany({
+      where: {
+        siteId: siteId,
+      },
       include: {
         products: true,
       },
@@ -21,9 +24,16 @@ export async function getCategories(): Promise<CategoryWithProducts[]> {
   }
 }
 
-export async function getCategoriesSimple() {
+export async function getCategoriesSimple(siteId: string): Promise<{ id: string; name: string }[]> {
   try {
     const categories = await db.category.findMany({
+      where: {
+        siteId: siteId,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
       orderBy: {
         name: 'asc',
       },
@@ -35,10 +45,13 @@ export async function getCategoriesSimple() {
   }
 }
 
-export async function getCategoryById(id: string): Promise<CategoryWithProducts | null> {
+export async function getCategoryById(id: string, siteId: string): Promise<CategoryWithProducts | null> {
   try {
-    const category = await db.category.findUnique({
-      where: { id },
+    const category = await db.category.findFirst({
+      where: { 
+        id: id,
+        siteId: siteId,
+      },
       include: {
         products: true,
       },
@@ -50,12 +63,13 @@ export async function getCategoryById(id: string): Promise<CategoryWithProducts 
   }
 }
 
-export async function createCategory(data: CategoryFormData): Promise<ApiResponse<CategoryWithProducts>> {
+export async function createCategory(data: CategoryFormData, siteId: string): Promise<ApiResponse<CategoryWithProducts>> {
   try {
     const category = await db.category.create({
       data: {
         name: data.name,
         description: data.description,
+        siteId: siteId,
       },
       include: {
         products: true,
@@ -78,13 +92,31 @@ export async function createCategory(data: CategoryFormData): Promise<ApiRespons
   }
 }
 
-export async function updateCategory(id: string, data: Partial<CategoryFormData>): Promise<ApiResponse<CategoryWithProducts>> {
+export async function updateCategory(id: string, data: Partial<CategoryFormData>, siteId: string): Promise<ApiResponse<CategoryWithProducts>> {
   try {
-    const category = await db.category.update({
-      where: { id },
+    const category = await db.category.updateMany({
+      where: { 
+        id: id,
+        siteId: siteId,
+      },
       data: {
         ...(data.name && { name: data.name }),
         ...(data.description !== undefined && { description: data.description }),
+      },
+    })
+
+    if (category.count === 0) {
+      return {
+        success: false,
+        error: 'Category not found or you do not have permission to update it',
+      }
+    }
+
+    // Fetch the updated category to return
+    const updatedCategory = await db.category.findFirst({
+      where: { 
+        id: id,
+        siteId: siteId,
       },
       include: {
         products: true,
@@ -96,7 +128,7 @@ export async function updateCategory(id: string, data: Partial<CategoryFormData>
 
     return {
       success: true,
-      data: category,
+      data: updatedCategory!,
     }
   } catch (error) {
     console.error('Error updating category:', error)
@@ -107,23 +139,46 @@ export async function updateCategory(id: string, data: Partial<CategoryFormData>
   }
 }
 
-export async function deleteCategory(id: string): Promise<ApiResponse<null>> {
+export async function deleteCategory(id: string, siteId: string): Promise<ApiResponse<void>> {
   try {
-    // Check if category has products
-    const productCount = await db.product.count({
-      where: { categoryId: id },
+    // First check if category has any products
+    const categoryWithProducts = await db.category.findFirst({
+      where: { 
+        id: id,
+        siteId: siteId,
+      },
+      include: {
+        products: true,
+      },
     })
 
-    if (productCount > 0) {
+    if (!categoryWithProducts) {
       return {
         success: false,
-        error: 'Cannot delete category with existing products. Please reassign or delete products first.',
+        error: 'Category not found',
       }
     }
 
-    await db.category.delete({
-      where: { id },
+    if (categoryWithProducts.products.length > 0) {
+      return {
+        success: false,
+        error: 'Cannot delete category with products. Please move or delete all products first.',
+      }
+    }
+
+    const result = await db.category.deleteMany({
+      where: { 
+        id: id,
+        siteId: siteId,
+      },
     })
+
+    if (result.count === 0) {
+      return {
+        success: false,
+        error: 'Category not found or you do not have permission to delete it',
+      }
+    }
 
     revalidatePath('/admin/categories')
     revalidatePath('/admin')

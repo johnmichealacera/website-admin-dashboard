@@ -4,9 +4,12 @@ import { db } from '@/lib/db'
 import { AboutFormData, ApiResponse, About } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
-export async function getAbout(): Promise<About | null> {
+export async function getAbout(siteId: string): Promise<About | null> {
   try {
     const about = await db.about.findFirst({
+      where: {
+        siteId: siteId,
+      },
       orderBy: {
         createdAt: 'desc',
       },
@@ -18,17 +21,24 @@ export async function getAbout(): Promise<About | null> {
   }
 }
 
-export async function createOrUpdateAbout(data: AboutFormData): Promise<ApiResponse<About>> {
+export async function createOrUpdateAbout(data: AboutFormData, siteId: string): Promise<ApiResponse<About>> {
   try {
-    // First check if about record exists
-    const existingAbout = await db.about.findFirst()
+    // First check if about record exists for this site
+    const existingAbout = await db.about.findFirst({
+      where: {
+        siteId: siteId,
+      },
+    })
 
     let about: About
 
     if (existingAbout) {
       // Update existing record
-      about = await db.about.update({
-        where: { id: existingAbout.id },
+      const result = await db.about.updateMany({
+        where: { 
+          id: existingAbout.id,
+          siteId: siteId,
+        },
         data: {
           title: data.title,
           content: data.content,
@@ -37,6 +47,21 @@ export async function createOrUpdateAbout(data: AboutFormData): Promise<ApiRespo
           values: data.values,
         },
       })
+
+      if (result.count === 0) {
+        return {
+          success: false,
+          error: 'About record not found or you do not have permission to update it',
+        }
+      }
+
+      // Fetch the updated record
+      about = await db.about.findFirst({
+        where: {
+          id: existingAbout.id,
+          siteId: siteId,
+        },
+      })!
     } else {
       // Create new record
       about = await db.about.create({
@@ -46,6 +71,7 @@ export async function createOrUpdateAbout(data: AboutFormData): Promise<ApiRespo
           mission: data.mission,
           vision: data.vision,
           values: data.values,
+          siteId: siteId,
         },
       })
     }
@@ -65,11 +91,21 @@ export async function createOrUpdateAbout(data: AboutFormData): Promise<ApiRespo
   }
 }
 
-export async function deleteAbout(id: string): Promise<ApiResponse<null>> {
+export async function deleteAbout(id: string, siteId: string): Promise<ApiResponse<void>> {
   try {
-    await db.about.delete({
-      where: { id },
+    const result = await db.about.deleteMany({
+      where: { 
+        id: id,
+        siteId: siteId,
+      },
     })
+
+    if (result.count === 0) {
+      return {
+        success: false,
+        error: 'About record not found or you do not have permission to delete it',
+      }
+    }
 
     revalidatePath('/admin/about')
 

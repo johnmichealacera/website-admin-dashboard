@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { EventFormData } from '@/lib/types'
 import { createEvent, updateEvent } from '@/lib/actions/events'
 import { Loader2, Calendar, MapPin, Users, DollarSign, Phone, Mail, Globe } from 'lucide-react'
+import { useTenant } from '@/contexts/tenant-context'
 
 interface EventFormProps {
   initialData?: Partial<EventFormData>
@@ -19,6 +20,7 @@ interface EventFormProps {
 }
 
 export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFormProps) {
+  const { currentSite } = useTenant()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<EventFormData>({
     title: initialData?.title || '',
@@ -53,12 +55,18 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!currentSite?.id) {
+      alert('No site selected')
+      return
+    }
+    
     setIsSubmitting(true)
 
     try {
       const result = eventId 
-        ? await updateEvent(eventId, formData)
-        : await createEvent(formData)
+        ? await updateEvent(eventId, formData, currentSite.id)
+        : await createEvent(formData, currentSite.id)
 
       if (result.success) {
         onSuccess?.()
@@ -87,6 +95,17 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
       ...prev,
       tags: prev.tags.filter(tag => tag !== tagToRemove)
     }))
+  }
+
+  // Show message if no site is selected
+  if (!currentSite) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <p className="text-gray-500">No site selected. Please select a site to continue.</p>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -128,33 +147,27 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
 
           {/* Date and Time */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Date & Time</h3>
+            <h3 className="text-lg font-semibold">Date and Time</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date & Time *</Label>
+                <Label htmlFor="startDate">Start Date *</Label>
                 <Input
                   id="startDate"
                   type="datetime-local"
                   value={formatDateTimeLocal(formData.startDate)}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    startDate: new Date(e.target.value) 
-                  }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, startDate: new Date(e.target.value) }))}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="endDate">End Date & Time</Label>
+                <Label htmlFor="endDate">End Date</Label>
                 <Input
                   id="endDate"
                   type="datetime-local"
                   value={formatDateTimeLocal(formData.endDate)}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    endDate: e.target.value ? new Date(e.target.value) : null 
-                  }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value ? new Date(e.target.value) : null }))}
                 />
               </div>
             </div>
@@ -163,7 +176,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
           {/* Location */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center">
-              <MapPin className="h-4 w-4 mr-2" />
+              <MapPin className="h-5 w-5 mr-2" />
               Location
             </h3>
             
@@ -209,12 +222,12 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="zipCode">Zip Code</Label>
+                <Label htmlFor="zipCode">ZIP Code</Label>
                 <Input
                   id="zipCode"
                   value={formData.zipCode || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, zipCode: e.target.value }))}
-                  placeholder="Enter zip code"
+                  placeholder="Enter ZIP code"
                 />
               </div>
             </div>
@@ -230,26 +243,22 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
             </div>
           </div>
 
-          {/* Event Details */}
+          {/* Pricing and Capacity */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Event Details</h3>
+            <h3 className="text-lg font-semibold flex items-center">
+              <DollarSign className="h-5 w-5 mr-2" />
+              Pricing and Capacity
+            </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price" className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1" />
-                  Price (₱)
-                </Label>
+                <Label htmlFor="price">Price (₱)</Label>
                 <Input
                   id="price"
                   type="number"
                   step="0.01"
-                  min="0"
-                  value={formData.price || 0}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    price: parseFloat(e.target.value) || 0 
-                  }))}
+                  value={formData.price || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
                   placeholder="0.00"
                 />
               </div>
@@ -262,40 +271,36 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                 <Input
                   id="maxAttendees"
                   type="number"
-                  min="1"
                   value={formData.maxAttendees || ''}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    maxAttendees: e.target.value ? parseInt(e.target.value) : null 
-                  }))}
-                  placeholder="No limit"
+                  onChange={(e) => setFormData(prev => ({ ...prev, maxAttendees: e.target.value ? parseInt(e.target.value) : null }))}
+                  placeholder="Unlimited"
                 />
               </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Tags</Label>
-              <div className="flex space-x-2">
-                <Input
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  placeholder="Add a tag"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      addTag()
-                    }
-                  }}
-                />
-                <Button type="button" onClick={addTag} variant="outline">
-                  Add
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-2">
+          {/* Tags */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Tags</h3>
+            
+            <div className="flex space-x-2">
+              <Input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                placeholder="Enter tag"
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+              />
+              <Button type="button" onClick={addTag} variant="outline">
+                Add Tag
+              </Button>
+            </div>
+
+            {formData.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
                 {formData.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                   >
                     {tag}
                     <button
@@ -308,7 +313,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                   </span>
                 ))}
               </div>
-            </div>
+            )}
           </div>
 
           {/* Contact Information */}
@@ -369,20 +374,16 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                 <Checkbox
                   id="isActive"
                   checked={formData.isActive}
-                  onCheckedChange={(checked) => 
-                    setFormData(prev => ({ ...prev, isActive: !!checked }))
-                  }
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked as boolean }))}
                 />
-                <Label htmlFor="isActive">Active (visible to public)</Label>
+                <Label htmlFor="isActive">Event is active</Label>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="isFeatured"
                   checked={formData.isFeatured}
-                  onCheckedChange={(checked) => 
-                    setFormData(prev => ({ ...prev, isFeatured: !!checked }))
-                  }
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFeatured: checked as boolean }))}
                 />
                 <Label htmlFor="isFeatured">Featured event</Label>
               </div>

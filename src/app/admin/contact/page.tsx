@@ -8,8 +8,10 @@ import { Label } from '@/components/ui/label'
 import { Phone, Loader2, Mail, MapPin, Globe } from 'lucide-react'
 import { Contact, ContactFormData } from '@/lib/types'
 import { getContact, createOrUpdateContact } from '@/lib/actions/contact'
+import { useTenant } from '@/contexts/tenant-context'
 
 export default function ContactPage() {
+  const { currentSite } = useTenant()
   const [contact, setContact] = useState<Contact | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -27,12 +29,16 @@ export default function ContactPage() {
   })
 
   useEffect(() => {
-    loadContact()
-  }, [])
+    if (currentSite?.id) {
+      loadContact()
+    }
+  }, [currentSite?.id])
 
   const loadContact = async () => {
+    if (!currentSite?.id) return
+    
     setLoading(true)
-    const data = await getContact()
+    const data = await getContact(currentSite.id)
     setContact(data)
     if (data) {
       setFormData({
@@ -73,10 +79,16 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!currentSite?.id) {
+      alert('No site selected')
+      return
+    }
+    
     setIsSubmitting(true)
 
     try {
-      const result = await createOrUpdateContact(formData)
+      const result = await createOrUpdateContact(formData, currentSite.id)
       if (result.success) {
         setIsEditing(false)
         loadContact()
@@ -100,6 +112,23 @@ export default function ContactPage() {
     }))
   }
 
+  // Show message if no site is selected
+  if (!currentSite) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <Phone className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No Site Selected
+          </h3>
+          <p className="text-gray-600">
+            Please select a site to manage contact information.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -117,7 +146,7 @@ export default function ContactPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Contact Information</h1>
           <p className="text-sm text-gray-500">
-            Manage your business contact details
+            Manage your business contact details for {currentSite.name}
           </p>
         </div>
         {!isEditing && (
@@ -132,7 +161,7 @@ export default function ContactPage() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Phone className="h-5 w-5 mr-2" />
-            Business Contact Details
+            Contact Details
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -145,19 +174,19 @@ export default function ContactPage() {
                     id="businessName"
                     value={formData.businessName}
                     onChange={(e) => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
-                    placeholder="Your business name"
+                    placeholder="Enter business name"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address *</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="contact@business.com"
+                    placeholder="Enter email address"
                     required
                   />
                 </div>
@@ -167,30 +196,31 @@ export default function ContactPage() {
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
+                  type="tel"
                   value={formData.phone || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="(555) 123-4567"
+                  placeholder="Enter phone number"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address">Street Address</Label>
+                <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
                   value={formData.address || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                  placeholder="123 Main Street"
+                  placeholder="Enter street address"
                 />
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="city">City</Label>
                   <Input
                     id="city"
                     value={formData.city || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                    placeholder="City"
+                    placeholder="Enter city"
                   />
                 </div>
 
@@ -200,7 +230,7 @@ export default function ContactPage() {
                     id="province"
                     value={formData.province || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, province: e.target.value }))}
-                    placeholder="Province"
+                    placeholder="Enter province"
                   />
                 </div>
 
@@ -210,34 +240,24 @@ export default function ContactPage() {
                     id="zipCode"
                     value={formData.zipCode || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, zipCode: e.target.value }))}
-                    placeholder="12345"
+                    placeholder="Enter ZIP code"
                   />
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Input
-                    id="country"
-                    value={formData.country || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
-                    placeholder="Country"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  value={formData.country || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
+                  placeholder="Enter country"
+                />
               </div>
 
               <div className="space-y-4">
                 <Label>Social Media Links</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="instagram">Instagram</Label>
-                    <Input
-                      id="instagram"
-                      value={formData.socialLinks?.instagram || ''}
-                      onChange={(e) => handleSocialLinkChange('instagram', e.target.value)}
-                      placeholder="https://instagram.com/yourhandle"
-                    />
-                  </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="facebook">Facebook</Label>
                     <Input
@@ -245,6 +265,36 @@ export default function ContactPage() {
                       value={formData.socialLinks?.facebook || ''}
                       onChange={(e) => handleSocialLinkChange('facebook', e.target.value)}
                       placeholder="https://facebook.com/yourpage"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="twitter">Twitter</Label>
+                    <Input
+                      id="twitter"
+                      value={formData.socialLinks?.twitter || ''}
+                      onChange={(e) => handleSocialLinkChange('twitter', e.target.value)}
+                      placeholder="https://twitter.com/youraccount"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="instagram">Instagram</Label>
+                    <Input
+                      id="instagram"
+                      value={formData.socialLinks?.instagram || ''}
+                      onChange={(e) => handleSocialLinkChange('instagram', e.target.value)}
+                      placeholder="https://instagram.com/youraccount"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      value={formData.socialLinks?.website || ''}
+                      onChange={(e) => handleSocialLinkChange('website', e.target.value)}
+                      placeholder="https://yourwebsite.com"
                     />
                   </div>
                 </div>
@@ -263,72 +313,60 @@ export default function ContactPage() {
           ) : contact ? (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center text-gray-900 mb-1">
-                      <Globe className="h-4 w-4 mr-2" />
-                      <span className="font-medium">Business Name</span>
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Business Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Globe className="h-4 w-4 text-gray-400" />
+                      <span className="font-medium">{contact.businessName}</span>
                     </div>
-                    <p className="text-gray-700">{contact.businessName}</p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center text-gray-900 mb-1">
-                      <Mail className="h-4 w-4 mr-2" />
-                      <span className="font-medium">Email</span>
+                    <div className="flex items-center space-x-2">
+                      <Mail className="h-4 w-4 text-gray-400" />
+                      <span>{contact.email}</span>
                     </div>
-                    <p className="text-gray-700">{contact.email}</p>
-                  </div>
-
-                  {contact.phone && (
-                    <div>
-                      <div className="flex items-center text-gray-900 mb-1">
-                        <Phone className="h-4 w-4 mr-2" />
-                        <span className="font-medium">Phone</span>
+                    {contact.phone && (
+                      <div className="flex items-center space-x-2">
+                        <Phone className="h-4 w-4 text-gray-400" />
+                        <span>{contact.phone}</span>
                       </div>
-                      <p className="text-gray-700">{contact.phone}</p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-4">
-                  {contact.address && (
-                    <div>
-                      <div className="flex items-center text-gray-900 mb-1">
-                        <MapPin className="h-4 w-4 mr-2" />
-                        <span className="font-medium">Address</span>
-                      </div>
-                      <div className="text-gray-700">
-                        <p>{contact.address}</p>
-                        {contact.city && (
-                          <p>
-                            {contact.city}
-                            {contact.province && `, ${contact.province}`}
-                            {contact.zipCode && ` ${contact.zipCode}`}
-                          </p>
-                        )}
-                        {contact.country && <p>{contact.country}</p>}
-                      </div>
-                    </div>
-                  )}
-
-                  {contact.socialLinks && Object.keys(contact.socialLinks).length > 0 && (
-                    <div>
-                      <div className="font-medium text-gray-900 mb-2">Social Media</div>
-                      <div className="space-y-1">
-                        {Object.entries(contact.socialLinks).map(([platform, url]) => (
-                          <div key={platform} className="text-gray-700">
-                            <span className="capitalize">{platform}:</span>{' '}
-                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                              {url}
-                            </a>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Address</h3>
+                  <div className="space-y-1 text-gray-700">
+                    {contact.address && <p>{contact.address}</p>}
+                    {(contact.city || contact.province || contact.zipCode) && (
+                      <p>
+                        {[contact.city, contact.province, contact.zipCode].filter(Boolean).join(', ')}
+                      </p>
+                    )}
+                    {contact.country && <p>{contact.country}</p>}
+                  </div>
                 </div>
               </div>
+
+              {contact.socialLinks && Object.keys(contact.socialLinks).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Social Media</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(contact.socialLinks).map(([platform, url]) => (
+                      <div key={platform} className="flex items-center space-x-2">
+                        <span className="font-medium capitalize">{platform}:</span>
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 truncate"
+                        >
+                          {url}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center py-12">

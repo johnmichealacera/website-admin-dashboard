@@ -4,9 +4,12 @@ import { db } from '@/lib/db'
 import { EventFormData, Event, ApiResponse } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
-export async function getEvents(): Promise<Event[]> {
+export async function getEvents(siteId: string): Promise<Event[]> {
   try {
     const events = await db.event.findMany({
+      where: {
+        siteId: siteId,
+      },
       orderBy: {
         startDate: 'asc',
       },
@@ -18,10 +21,13 @@ export async function getEvents(): Promise<Event[]> {
   }
 }
 
-export async function getEventById(id: string): Promise<Event | null> {
+export async function getEventById(id: string, siteId: string): Promise<Event | null> {
   try {
-    const event = await db.event.findUnique({
-      where: { id },
+    const event = await db.event.findFirst({
+      where: {
+        id: id,
+        siteId: siteId,
+      },
     })
     return event
   } catch (error) {
@@ -30,7 +36,7 @@ export async function getEventById(id: string): Promise<Event | null> {
   }
 }
 
-export async function createEvent(data: EventFormData): Promise<ApiResponse<Event>> {
+export async function createEvent(data: EventFormData, siteId: string): Promise<ApiResponse<Event>> {
   try {
     const event = await db.event.create({
       data: {
@@ -53,6 +59,7 @@ export async function createEvent(data: EventFormData): Promise<ApiResponse<Even
         contactEmail: data.contactEmail,
         contactPhone: data.contactPhone,
         websiteUrl: data.websiteUrl,
+        siteId: siteId,
       },
     })
 
@@ -72,10 +79,13 @@ export async function createEvent(data: EventFormData): Promise<ApiResponse<Even
   }
 }
 
-export async function updateEvent(id: string, data: Partial<EventFormData>): Promise<ApiResponse<Event>> {
+export async function updateEvent(id: string, data: Partial<EventFormData>, siteId: string): Promise<ApiResponse<Event>> {
   try {
-    const event = await db.event.update({
-      where: { id },
+    const event = await db.event.updateMany({
+      where: {
+        id: id,
+        siteId: siteId,
+      },
       data: {
         ...(data.title && { title: data.title }),
         ...(data.description !== undefined && { description: data.description }),
@@ -99,12 +109,27 @@ export async function updateEvent(id: string, data: Partial<EventFormData>): Pro
       },
     })
 
+    if (event.count === 0) {
+      return {
+        success: false,
+        error: 'Event not found or you do not have permission to update it',
+      }
+    }
+
+    // Fetch the updated event to return
+    const updatedEvent = await db.event.findFirst({
+      where: {
+        id: id,
+        siteId: siteId,
+      },
+    })
+
     revalidatePath('/admin/events')
     revalidatePath('/admin')
 
     return {
       success: true,
-      data: event,
+      data: updatedEvent!,
     }
   } catch (error) {
     console.error('Error updating event:', error)
@@ -115,11 +140,21 @@ export async function updateEvent(id: string, data: Partial<EventFormData>): Pro
   }
 }
 
-export async function deleteEvent(id: string): Promise<ApiResponse<null>> {
+export async function deleteEvent(id: string, siteId: string): Promise<ApiResponse<void>> {
   try {
-    await db.event.delete({
-      where: { id },
+    const result = await db.event.deleteMany({
+      where: {
+        id: id,
+        siteId: siteId,
+      },
     })
+
+    if (result.count === 0) {
+      return {
+        success: false,
+        error: 'Event not found or you do not have permission to delete it',
+      }
+    }
 
     revalidatePath('/admin/events')
     revalidatePath('/admin')
@@ -136,15 +171,13 @@ export async function deleteEvent(id: string): Promise<ApiResponse<null>> {
   }
 }
 
-export async function getFeaturedEvents(): Promise<Event[]> {
+export async function getFeaturedEvents(siteId: string): Promise<Event[]> {
   try {
     const events = await db.event.findMany({
       where: {
+        siteId: siteId,
         isFeatured: true,
         isActive: true,
-        startDate: {
-          gte: new Date(),
-        },
       },
       orderBy: {
         startDate: 'asc',
@@ -157,14 +190,15 @@ export async function getFeaturedEvents(): Promise<Event[]> {
   }
 }
 
-export async function getUpcomingEvents(): Promise<Event[]> {
+export async function getUpcomingEvents(siteId: string): Promise<Event[]> {
   try {
     const events = await db.event.findMany({
       where: {
-        isActive: true,
+        siteId: siteId,
         startDate: {
           gte: new Date(),
         },
+        isActive: true,
       },
       orderBy: {
         startDate: 'asc',

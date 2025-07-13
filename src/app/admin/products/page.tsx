@@ -8,20 +8,26 @@ import { Plus, Package, Edit, Trash2 } from 'lucide-react'
 import { ProductWithCategory } from '@/lib/types'
 import { getProducts, deleteProduct } from '@/lib/actions/products'
 import { formatPrice, formatDate } from '@/lib/utils'
+import { useTenant } from '@/contexts/tenant-context'
 
 export default function ProductsPage() {
+  const { currentSite } = useTenant()
   const [products, setProducts] = useState<ProductWithCategory[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<ProductWithCategory | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadProducts()
-  }, [])
+    if (currentSite?.id) {
+      loadProducts()
+    }
+  }, [currentSite?.id])
 
   const loadProducts = async () => {
+    if (!currentSite?.id) return
+    
     setLoading(true)
-    const data = await getProducts()
+    const data = await getProducts(currentSite.id)
     setProducts(data)
     setLoading(false)
   }
@@ -37,11 +43,13 @@ export default function ProductsPage() {
   }
 
   const handleDeleteProduct = async (id: string) => {
+    if (!currentSite?.id) return
+    
     if (!confirm('Are you sure you want to delete this product?')) {
       return
     }
 
-    const result = await deleteProduct(id)
+    const result = await deleteProduct(id, currentSite.id)
     if (result.success) {
       loadProducts()
     } else {
@@ -58,6 +66,23 @@ export default function ProductsPage() {
   const handleFormCancel = () => {
     setShowForm(false)
     setEditingProduct(null)
+  }
+
+  // Show message if no site is selected
+  if (!currentSite) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No Site Selected
+          </h3>
+          <p className="text-gray-600">
+            Please select a site to manage products.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   if (showForm) {
@@ -88,7 +113,7 @@ export default function ProductsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Products</h1>
           <p className="text-sm text-gray-500">
-            Manage your product inventory
+            Manage your product inventory for {currentSite.name}
           </p>
         </div>
         <Button onClick={handleAddProduct}>

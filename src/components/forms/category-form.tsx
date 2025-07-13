@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CategoryFormData } from '@/lib/types'
 import { createCategory, updateCategory } from '@/lib/actions/categories'
 import { Loader2 } from 'lucide-react'
+import { useTenant } from '@/contexts/tenant-context'
 
 interface CategoryFormProps {
   initialData?: Partial<CategoryFormData>
@@ -18,6 +19,7 @@ interface CategoryFormProps {
 }
 
 export function CategoryForm({ initialData, categoryId, onSuccess, onCancel }: CategoryFormProps) {
+  const { currentSite } = useTenant()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<CategoryFormData>({
     name: initialData?.name || '',
@@ -26,12 +28,18 @@ export function CategoryForm({ initialData, categoryId, onSuccess, onCancel }: C
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!currentSite?.id) {
+      alert('No site selected')
+      return
+    }
+    
     setIsSubmitting(true)
 
     try {
       const result = categoryId 
-        ? await updateCategory(categoryId, formData)
-        : await createCategory(formData)
+        ? await updateCategory(categoryId, formData, currentSite.id)
+        : await createCategory(formData, currentSite.id)
 
       if (result.success) {
         onSuccess?.()
@@ -43,6 +51,17 @@ export function CategoryForm({ initialData, categoryId, onSuccess, onCancel }: C
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  // Show message if no site is selected
+  if (!currentSite) {
+    return (
+      <Card>
+        <CardContent className="text-center py-8">
+          <p className="text-gray-500">No site selected. Please select a site to continue.</p>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
