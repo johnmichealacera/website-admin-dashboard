@@ -23,7 +23,6 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
     name: initialData?.name || '',
     description: initialData?.description || '',
     basePrice: initialData?.basePrice || 0,
-    imageUrls: initialData?.imageUrls || [],
     isActive: initialData?.isActive ?? true,
     isFeatured: initialData?.isFeatured ?? false,
     category: initialData?.category || '',

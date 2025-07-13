@@ -158,7 +158,6 @@ model EventService {
   name            String
   description     String?
   basePrice       Float?    @default(0)
-  imageUrls       String[]  @default([])
   isActive        Boolean   @default(true)
   isFeatured      Boolean   @default(false)
   category        String?   // e.g., "Wedding", "Corporate", "Birthday"

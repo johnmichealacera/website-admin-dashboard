@@ -65,6 +65,7 @@ export async function getEventService(id: string, siteId: string): Promise<ApiRe
 
 export async function createEventService(data: EventServiceFormData): Promise<ApiResponse<EventService>> {
   try {
+    console.log('createEventService data', data)
     const eventService = await db.eventService.create({
       data: {
         ...data,

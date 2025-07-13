@@ -161,7 +161,6 @@ export interface EventService {
   name: string
   description: string | null
   basePrice: number | null
-  imageUrls: string[]
   isActive: boolean
   isFeatured: boolean
   category: string | null
@@ -212,7 +211,7 @@ export type ContactFormData = Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>
 
 export type EventFormData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
 
-export type EventServiceFormData = Omit<EventService, 'id' | 'createdAt' | 'updatedAt'>
+export type EventServiceFormData = Omit<EventService, 'id' | 'createdAt' | 'updatedAt' | 'imageUrls'>
 
 export type SiteFormData = Omit<Site, 'id' | 'createdAt' | 'updatedAt'>
 

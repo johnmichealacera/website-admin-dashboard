@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CategoryForm } from '@/components/forms/category-form'
@@ -18,15 +18,14 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true)
 
   // Load categories for the current site
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     if (!currentSite?.id) return
     
     setLoading(true)
     const data = await getCategories(currentSite.id)
     setCategories(data)
     setLoading(false)
-  }
+  }, [currentSite?.id])
 
   // Load categories when the current site changes
   useEffect(() => {
