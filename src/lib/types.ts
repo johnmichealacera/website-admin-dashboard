@@ -12,6 +12,7 @@ export interface SitePackageInfo {
   logoUrl?: string | null
   packageType?: SitePackage
   features?: SiteFeature[]
+  featuresOrder?: SiteFeature[]
   isActive?: boolean
   updatedAt: Date
   _count?: {
@@ -56,6 +57,7 @@ export interface Site {
   isActive: boolean
   packageType: SitePackage
   features: SiteFeature[]
+  featuresOrder: SiteFeature[]
   createdAt: Date
   updatedAt: Date
 }
@@ -216,6 +218,20 @@ export type EventFormData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
 export type EventServiceFormData = Omit<EventService, 'id' | 'createdAt' | 'updatedAt' | 'imageUrls'>
 
 export type SiteFormData = Omit<Site, 'id' | 'createdAt' | 'updatedAt'>
+
+// Client Site Settings Types (for regular admins)
+export interface ClientSiteSettingsData {
+  name: string
+  features: SiteFeature[]
+  featuresOrder: SiteFeature[]
+}
+
+export interface ClientSiteUpdateData {
+  siteId: string
+  name: string
+  features: SiteFeature[]
+  featuresOrder: SiteFeature[]
+}
 
 export type UserFormData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>
 

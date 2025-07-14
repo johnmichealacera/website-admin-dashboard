@@ -30,7 +30,16 @@ interface AdminLayoutProps {
   children: ReactNode
 }
 
-const navItems = [
+interface NavItem {
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  feature: SiteFeature | null
+  superAdminOnly?: boolean
+  regularAdminAccess?: boolean
+}
+
+const navItems: NavItem[] = [
   { href: '/admin', icon: Home, label: 'Dashboard', feature: SiteFeature.DASHBOARD },
   { href: '/admin/products', icon: Package, label: 'Products', feature: SiteFeature.PRODUCTS },
   { href: '/admin/categories', icon: Tags, label: 'Categories', feature: SiteFeature.CATEGORIES },
@@ -38,7 +47,8 @@ const navItems = [
   { href: '/admin/event-services', icon: Sparkles, label: 'Event Services', feature: SiteFeature.EVENT_SERVICES },
   { href: '/admin/about', icon: FileText, label: 'About Us', feature: SiteFeature.ABOUT },
   { href: '/admin/contact', icon: Phone, label: 'Contact Info', feature: SiteFeature.CONTACT },
-  { href: '/admin/settings', icon: Settings, label: 'Site Settings', feature: null, superAdminOnly: true },
+  { href: '/admin/site-settings', icon: Settings, label: 'Site Settings', feature: null, regularAdminAccess: true },
+  { href: '/admin/settings', icon: Settings, label: 'Admin Settings', feature: null, superAdminOnly: true },
 ]
 
 export function AdminLayout({ children }: AdminLayoutProps) {
@@ -143,12 +153,34 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       return currentUser?.role === 'SUPER_ADMIN'
     }
     
+    // Check regular admin access items (like site settings)
+    if (item.regularAdminAccess) {
+      return currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN'
+    }
+    
     // Check if feature is available for current site
     if (item.feature && currentSite?.features) {
       return isFeatureAvailable(currentSite.features, item.feature)
     }
     
     return false
+  })
+
+  // Sort navigation items based on site's custom featuresOrder
+  const sortedNavItems = [...availableNavItems].sort((a, b) => {
+    if (!currentSite?.featuresOrder) {
+      return 0 // Keep original order if no custom order is set
+    }
+    
+    const aIndex = a.feature ? currentSite.featuresOrder.indexOf(a.feature) : -1
+    const bIndex = b.feature ? currentSite.featuresOrder.indexOf(b.feature) : -1
+    
+    // If feature is not in custom order, put it at the end
+    if (aIndex === -1 && bIndex === -1) return 0
+    if (aIndex === -1) return 1
+    if (bIndex === -1) return -1
+    
+    return aIndex - bIndex
   })
 
   return (
@@ -190,7 +222,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
         <nav className="mt-4">
           <div className="space-y-1 px-3">
-            {availableNavItems.map((item) => {
+            {sortedNavItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
               

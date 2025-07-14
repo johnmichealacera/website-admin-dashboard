@@ -87,6 +87,8 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
     const files = e.target.files
     if (!files || files.length === 0) return
     
+    // Only take the first file since we only allow one image
+    const file = files[0]
 
     if (!cloudinaryUrl || !uploadPreset || !apiKey) {
       alert('Cloudinary configuration is missing. Please check your environment variables.')
@@ -96,22 +98,18 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
     setIsUploading(true)
     
     try {
-      const uploadPromises = Array.from(files).map(async (file) => {
-        return await handleFileChange(cloudinaryUrl, uploadPreset, apiKey, file)
-      })
+      const uploadedUrl = await handleFileChange(cloudinaryUrl, uploadPreset, apiKey, file)
 
-      const uploadedUrls = await Promise.all(uploadPromises)
-      const validUrls = uploadedUrls.filter((url: string | undefined) => url && url.trim() !== '')
-
-      if (validUrls.length > 0) {
+      if (uploadedUrl && uploadedUrl.trim() !== '') {
+        // Replace the existing image with the new one
         setFormData(prev => ({
           ...prev,
-          imageUrls: [...prev.imageUrls, ...validUrls] as string[]
+          imageUrls: [uploadedUrl]
         }))
       }
     } catch (err) {
-      console.error('Error uploading files:', err)
-      alert('Failed to upload images. Please try again.')
+      console.error('Error uploading file:', err)
+      alert('Failed to upload image. Please try again.')
     } finally {
       setIsUploading(false)
       // Reset the input
@@ -119,10 +117,10 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
     }
   }
 
-  const removeImage = (indexToRemove: number) => {
+  const removeImage = () => {
     setFormData(prev => ({
       ...prev,
-      imageUrls: prev.imageUrls.filter((_, index) => index !== indexToRemove)
+      imageUrls: []
     }))
   }
 
@@ -214,7 +212,7 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
           </div>
 
           <div className="space-y-4">
-            <Label>Product Images</Label>
+            <Label>Product Image</Label>
             
             {/* Image Upload */}
             <div className="space-y-2">
@@ -223,15 +221,15 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
                   {isUploading ? (
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
-                      <p className="text-sm text-gray-500">Uploading images...</p>
+                      <p className="text-sm text-gray-500">Uploading image...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Upload className="w-8 h-8 mb-3 text-gray-400" />
                       <p className="mb-2 text-sm text-gray-500">
-                        <span className="font-semibold">Click to upload</span> product images
+                        <span className="font-semibold">Click to upload</span> product image
                       </p>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB (multiple files allowed)</p>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
                     </div>
                   )}
                   <input
@@ -239,7 +237,6 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
                     type="file"
                     className="hidden"
                     accept="image/*"
-                    multiple
                     onChange={handleImageUpload}
                     disabled={isUploading}
                   />
@@ -250,43 +247,39 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
             {/* Image Preview */}
             {formData.imageUrls.length > 0 && (
               <div className="space-y-2">
-                <Label>Uploaded Images ({formData.imageUrls.length})</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {formData.imageUrls.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border">
-                        <Image
-                          width={100}
-                          height={100}
-                          src={url}
-                          alt={`Product image ${index + 1}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            // Fallback for broken images
-                            e.currentTarget.style.display = 'none'
-                            e.currentTarget.parentElement?.insertAdjacentHTML('afterbegin', 
-                              `<div class="w-full h-full flex items-center justify-center text-gray-400">
-                                <div class="text-center">
-                                  <svg class="w-8 h-8 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-                                  </svg>
-                                  <p class="text-xs">Image Error</p>
-                                </div>
-                              </div>`
-                            )
-                          }}
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600"
-                        title="Remove image"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+                <Label>Current Image</Label>
+                <div className="relative inline-block">
+                  <div className="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden border">
+                    <Image
+                      width={128}
+                      height={128}
+                      src={formData.imageUrls[0]}
+                      alt="Product image"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback for broken images
+                        e.currentTarget.style.display = 'none'
+                        e.currentTarget.parentElement?.insertAdjacentHTML('afterbegin', 
+                          `<div class="w-full h-full flex items-center justify-center text-gray-400">
+                            <div class="text-center">
+                              <svg class="w-8 h-8 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                              </svg>
+                              <p class="text-xs">Image Error</p>
+                            </div>
+                          </div>`
+                        )
+                      }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                    title="Remove image"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             )}
