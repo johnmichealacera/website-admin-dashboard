@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Local Business Admin Dashboard",
-  description: "Local Business Admin Dashboard",
+  title: "LocalWebVentures Admin Dashboard",
+  description: "LocalWebVentures Admin Dashboard",
 };
 
 export default function RootLayout({

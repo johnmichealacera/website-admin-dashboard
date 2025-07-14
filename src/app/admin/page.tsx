@@ -1,67 +1,148 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, Tags, PhilippinePeso, AlertTriangle, Calendar } from 'lucide-react'
+import { Package, Tags, Calendar, Sparkles, CheckCircle, XCircle } from 'lucide-react'
 import { useTenant } from '@/contexts/tenant-context'
 import { getProductsStats } from '@/lib/actions/products'
 import { getCategories } from '@/lib/actions/categories'
 import { getEvents } from '@/lib/actions/events'
+import { getEventServicesStats } from '@/lib/actions/event-services'
+import { getAbout } from '@/lib/actions/about'
+import { getContact } from '@/lib/actions/contact'
 import { useState, useEffect } from 'react'
+import { SiteFeature } from '@/lib/types'
 
-interface DashboardStats {
-  totalProducts: number
-  totalCategories: number
-  lowStockItems: number
-  totalValue: number
-  totalEvents: number
-  upcomingEvents: number
+interface DynamicMetric {
+  feature: SiteFeature
+  title: string
+  value: string | number
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+  color: string
 }
 
 export default function AdminDashboard() {
   const { currentSite } = useTenant()
-  const [stats, setStats] = useState<DashboardStats>({
-    totalProducts: 0,
-    totalCategories: 0,
-    lowStockItems: 0,
-    totalValue: 0,
-    totalEvents: 0,
-    upcomingEvents: 0
-  })
+  const [metrics, setMetrics] = useState<DynamicMetric[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (currentSite?.id) {
-      getDashboardStats()
+    if (currentSite?.id && currentSite.features) {
+      getDynamicMetrics()
     }
-  }, [currentSite?.id])
+  }, [currentSite?.id, currentSite?.features])
 
-  const getDashboardStats = async () => {
-    if (!currentSite?.id) return
+  const getDynamicMetrics = async () => {
+    if (!currentSite?.id || !currentSite.features) return
 
     try {
       setLoading(true)
-      const [productStats, categories, events] = await Promise.all([
-        getProductsStats(currentSite.id),
-        getCategories(currentSite.id),
-        getEvents(currentSite.id)
-      ])
+      
+      // Get the first 4 features after DASHBOARD
+      const availableFeatures = currentSite.features
+        .filter(feature => feature !== SiteFeature.DASHBOARD)
+        .slice(0, 4)
 
-      const upcomingEvents = events.filter(event => 
-        event.isActive && new Date(event.startDate) >= new Date()
-      )
-
-      setStats({
-        totalProducts: productStats.totalProducts,
-        totalCategories: categories.length,
-        lowStockItems: productStats.lowStockProducts,
-        totalValue: productStats.totalInventoryValue,
-        totalEvents: events.filter(event => event.isActive).length,
-        upcomingEvents: upcomingEvents.length
-      })
+      const metricsPromises = availableFeatures.map(feature => getMetricForFeature(feature, currentSite.id))
+      const metricsResults = await Promise.all(metricsPromises)
+      
+      setMetrics(metricsResults.filter(Boolean) as DynamicMetric[])
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error)
+      console.error('Error fetching dynamic metrics:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const getMetricForFeature = async (feature: SiteFeature, siteId: string): Promise<DynamicMetric | null> => {
+    try {
+      switch (feature) {
+        case SiteFeature.PRODUCTS: {
+          const stats = await getProductsStats(siteId)
+          return {
+            feature,
+            title: 'Total Products',
+            value: stats.totalProducts,
+            description: `${stats.activeProducts} active, ${stats.lowStockProducts} low stock`,
+            icon: Package,
+            color: 'text-blue-600'
+          }
+        }
+
+        case SiteFeature.CATEGORIES: {
+          const categories = await getCategories(siteId)
+          const totalProducts = categories.reduce((sum, cat) => sum + cat.products.length, 0)
+          return {
+            feature,
+            title: 'Categories',
+            value: categories.length,
+            description: `${totalProducts} total products`,
+            icon: Tags,
+            color: 'text-green-600'
+          }
+        }
+
+        case SiteFeature.EVENTS: {
+          const events = await getEvents(siteId)
+          const upcomingEvents = events.filter(event => 
+            event.isActive && new Date(event.startDate) >= new Date()
+          )
+          return {
+            feature,
+            title: 'Events',
+            value: events.filter(e => e.isActive).length,
+            description: `${upcomingEvents.length} upcoming events`,
+            icon: Calendar,
+            color: 'text-purple-600'
+          }
+        }
+
+        case SiteFeature.EVENT_SERVICES: {
+          const statsResult = await getEventServicesStats(siteId)
+          if (statsResult.success && statsResult.data) {
+            const { totalServices, activeServices, featuredServices } = statsResult.data
+            return {
+              feature,
+              title: 'Event Services',
+              value: totalServices,
+              description: `${activeServices} active, ${featuredServices} featured`,
+              icon: Sparkles,
+              color: 'text-yellow-600'
+            }
+          }
+          return null
+        }
+
+        case SiteFeature.ABOUT: {
+          const about = await getAbout(siteId)
+          return {
+            feature,
+            title: 'About Us',
+            value: about ? 'Configured' : 'Not Set',
+            description: about ? 'Business information complete' : 'Setup required',
+            icon: about ? CheckCircle : XCircle,
+            color: about ? 'text-green-600' : 'text-gray-400'
+          }
+        }
+
+        case SiteFeature.CONTACT: {
+          const contact = await getContact(siteId)
+          return {
+            feature,
+            title: 'Contact Info',
+            value: contact ? 'Configured' : 'Not Set',
+            description: contact ? 'Contact information complete' : 'Setup required',
+            icon: contact ? CheckCircle : XCircle,
+            color: contact ? 'text-green-600' : 'text-gray-400'
+          }
+        }
+
+        default:
+          return null
+      }
+    } catch (error) {
+      console.error(`Error fetching metric for ${feature}:`, error)
+      return null
     }
   }
 
@@ -85,10 +166,20 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500">
-          Overview of {currentSite.name}
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500">
+            Overview of {currentSite.name} • {currentSite.packageType} Package
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm font-medium text-gray-700">
+            {currentSite.features.length} Features Available
+          </p>
+          <p className="text-xs text-gray-500">
+            Package: {currentSite.packageType}
+          </p>
+        </div>
       </div>
 
       {loading ? (
@@ -98,97 +189,87 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalProducts}</div>
-                <p className="text-xs text-muted-foreground">
-                  Active products in inventory
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Categories</CardTitle>
-                <Tags className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalCategories}</div>
-                <p className="text-xs text-muted-foreground">
-                  Product categories
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Events</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalEvents}</div>
-                <p className="text-xs text-muted-foreground">
-                  Active events
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Inventory Value</CardTitle>
-                <PhilippinePeso className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  ₱{stats.totalValue.toFixed(2)}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Total inventory value
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-orange-600">
-                  {stats.lowStockItems}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Items with stock &lt; 5
-                </p>
-              </CardContent>
-            </Card>
+          {/* Dynamic Feature Metrics */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {metrics.map(({ feature, title, value, description, icon: Icon, color }) => (
+              <Card key={feature}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                  <Icon className={`h-4 w-4 ${color}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Upcoming Events</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-blue-600">
-                  {stats.upcomingEvents}
-                </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  Events scheduled for the future
-                </p>
-                {stats.upcomingEvents > 0 && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Check the Events section to manage upcoming events
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+          {/* Additional Metrics for Sites with Many Features */}
+          {currentSite.features.length > 4 && (
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Additional Features</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="text-lg font-semibold">
+                      {currentSite.features.length - 4} More Features
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Your {currentSite.packageType} package includes additional features beyond the main dashboard metrics.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {currentSite.features
+                        .filter(feature => feature !== SiteFeature.DASHBOARD)
+                        .slice(4)
+                        .map(feature => (
+                          <span
+                            key={feature}
+                            className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
+                          >
+                            {feature.toLowerCase().replace('_', ' ')}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
+              <Card>
+                <CardHeader>
+                  <CardTitle>Package Information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="text-lg font-semibold text-blue-600">
+                        {currentSite.packageType} Package
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Complete business management solution with {currentSite.features.length} features.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-sm">Getting Started</h3>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>• Navigate using the sidebar menu</li>
+                        <li>• Configure your business information</li>
+                        <li>• Add your products and categories</li>
+                        <li>• Set up events and services</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Welcome Section for Basic Packages */}
+          {currentSite.features.length <= 4 && (
             <Card>
               <CardHeader>
                 <CardTitle>Welcome to {currentSite.name}</CardTitle>
@@ -196,34 +277,39 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-gray-600">
-                    Manage your business inventory, categories, events, and business information from this dashboard.
+                    Manage your business with the {currentSite.packageType} package features. 
+                    Your current package includes {currentSite.features.length} powerful features.
                   </p>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <h3 className="font-semibold">Quick Actions</h3>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li>• Add new products to your inventory</li>
-                        <li>• Create and manage product categories</li>
-                        <li>• Schedule and manage events</li>
-                        <li>• Update your business information</li>
-                        <li>• Manage contact details</li>
-                      </ul>
+                      <h3 className="font-semibold">Available Features</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {currentSite.features
+                          .filter(feature => feature !== SiteFeature.DASHBOARD)
+                          .map(feature => (
+                            <span
+                              key={feature}
+                              className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs"
+                            >
+                              {feature.toLowerCase().replace('_', ' ')}
+                            </span>
+                          ))}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <h3 className="font-semibold">Getting Started</h3>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        <li>• Navigate using the sidebar menu</li>
-                        <li>• Check the Products section to manage inventory</li>
-                        <li>• Review upcoming events regularly</li>
-                        <li>• Review low stock items regularly</li>
-                        <li>• Keep your business info up to date</li>
+                        <li>• Use the sidebar to navigate features</li>
+                        <li>• Start by setting up your categories</li>
+                        <li>• Add your first products</li>
+                        <li>• Monitor your dashboard regularly</li>
                       </ul>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          )}
         </>
       )}
     </div>
