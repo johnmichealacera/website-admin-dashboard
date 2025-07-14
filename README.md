@@ -19,7 +19,8 @@ A modern, full-stack multi-tenant admin dashboard for managing business inventor
 - **Event Management**: Create and manage business events with dates, locations, attendee limits, and image galleries
 - **Event Services**: Comprehensive service package management with pricing, add-ons, and freebies
 - **Business Information**: Update About Us and Contact information
-- **Image Upload**: Cloudinary integration for product and event images with optimized storage
+- **Logo Management**: Upload, replace, and remove site logos with Cloudinary integration
+- **Image Upload**: Cloudinary integration for product, event, and logo images with optimized storage
 
 ### Multi-Tenant Features
 - **Site Selector**: Users with access to multiple sites can switch between them
@@ -130,6 +131,7 @@ The application uses the following database models:
 - `domain` - Primary domain
 - `subdomain` - Subdomain (optional)
 - `description` - Site description
+- `logoUrl` - Site logo URL (Cloudinary, optional)
 - `isActive` - Site status
 - `packageType` - Package type (BASIC, STANDARD, PREMIUM, ENTERPRISE)
 - `features` - Array of enabled features

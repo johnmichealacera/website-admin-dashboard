@@ -9,6 +9,7 @@ export interface SitePackageInfo {
   id: string
   name: string
   domain?: string
+  logoUrl?: string | null
   packageType?: SitePackage
   features?: SiteFeature[]
   isActive?: boolean
@@ -51,6 +52,7 @@ export interface Site {
   domain: string
   subdomain: string | null
   description: string | null
+  logoUrl: string | null
   isActive: boolean
   packageType: SitePackage
   features: SiteFeature[]

@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Settings, Package, Shield, Building2, AlertCircle, Save, Loader2 } from 'lucide-react'
+import { Settings, Package, Shield, Building2, AlertCircle, Save, Loader2, Upload, X } from 'lucide-react'
 import { useTenant } from '@/contexts/tenant-context'
 import { SitePackage, SiteFeature, SitePackageFormData, SitePackageInfo } from '@/lib/types'
-import { updateSitePackage, getSitePackageInfo, getAllSitesPackageInfo } from '@/lib/actions/site-settings'
+import { updateSitePackage, getSitePackageInfo, getAllSitesPackageInfo, updateSiteLogo } from '@/lib/actions/site-settings'
 import { PACKAGE_FEATURES } from '@/lib/utils/site-features'
+import { handleFileChange } from "@jmacera/cloudinary-image-upload";
+import Image from 'next/image'
 
 export default function SiteSettingsPage() {
   const { currentUser, currentSite } = useTenant()
@@ -21,8 +23,14 @@ export default function SiteSettingsPage() {
     features: [SiteFeature.DASHBOARD]
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Cloudinary configuration
+  const cloudinaryUrl = process.env.NEXT_PUBLIC_CLOUDINARY_URL
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+  const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY
 
   useEffect(() => {
     loadAllSites()
@@ -88,6 +96,66 @@ export default function SiteSettingsPage() {
         ? prev.features.filter(f => f !== feature)
         : [...prev.features, feature]
     }))
+  }
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !selectedSite) return
+
+    if (!cloudinaryUrl || !uploadPreset || !apiKey) {
+      setError('Cloudinary configuration is missing. Please check your environment variables.')
+      return
+    }
+
+    setIsUploadingLogo(true)
+    setError(null)
+
+    try {
+      const uploadedUrl = await handleFileChange(cloudinaryUrl, uploadPreset, apiKey, file)
+      
+      if (uploadedUrl && uploadedUrl.trim() !== '') {
+        const result = await updateSiteLogo(selectedSite.id, uploadedUrl)
+        
+        if (result.success) {
+          setSelectedSite(prev => prev ? { ...prev, logoUrl: uploadedUrl } : null)
+          // Refresh the sites list to reflect changes
+          loadAllSites()
+        } else {
+          setError(result.error || 'Failed to update site logo')
+        }
+      }
+    } catch (err) {
+      console.error('Error uploading logo:', err)
+      setError('Failed to upload logo. Please try again.')
+    } finally {
+      setIsUploadingLogo(false)
+      // Reset the input
+      e.target.value = ''
+    }
+  }
+
+  const handleLogoRemove = async () => {
+    if (!selectedSite) return
+
+    setIsUploadingLogo(true)
+    setError(null)
+
+    try {
+      const result = await updateSiteLogo(selectedSite.id, null)
+      
+      if (result.success) {
+        setSelectedSite(prev => prev ? { ...prev, logoUrl: null } : null)
+        // Refresh the sites list to reflect changes
+        loadAllSites()
+      } else {
+        setError(result.error || 'Failed to remove site logo')
+      }
+    } catch (err) {
+      console.error('Error removing logo:', err)
+      setError('Failed to remove logo. Please try again.')
+    } finally {
+      setIsUploadingLogo(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -195,9 +263,26 @@ export default function SiteSettingsPage() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-900">{site.name}</p>
-                      <p className="text-sm text-gray-500">{site.domain}</p>
+                    <div className="flex items-center space-x-3">
+                      {site.logoUrl ? (
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden border">
+                          <Image
+                            src={site.logoUrl}
+                            alt={`${site.name} logo`}
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg border flex items-center justify-center">
+                          <Building2 className="h-5 w-5 text-gray-400" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-medium text-gray-900">{site.name}</p>
+                        <p className="text-sm text-gray-500">{site.domain}</p>
+                      </div>
                     </div>
                     <Badge variant={site.packageType === SitePackage.ENTERPRISE ? 'default' : 'secondary'}>
                       {site.packageType}
@@ -292,6 +377,95 @@ export default function SiteSettingsPage() {
                       })}
                     </div>
                   </div>
+                </div>
+
+                {/* Site Logo Upload */}
+                <div className="space-y-4">
+                  <div>
+                    <Label>Site Logo</Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Upload a logo for this site. Recommended size: 200x200px or larger.
+                    </p>
+                  </div>
+
+                  {selectedSite.logoUrl ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border">
+                          <Image
+                            src={selectedSite.logoUrl}
+                            alt={`${selectedSite.name} logo`}
+                            width={80}
+                            height={80}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            Current Logo
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Logo is uploaded and active
+                          </p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleLogoRemove}
+                          disabled={isUploadingLogo}
+                          className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Remove
+                        </Button>
+                      </div>
+                      
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                        <div className="flex flex-col items-center">
+                          <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-600 mb-2">
+                            Click to replace current logo
+                          </p>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleLogoUpload}
+                            disabled={isUploadingLogo}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                      <div className="flex flex-col items-center">
+                        {isUploadingLogo ? (
+                          <>
+                            <Loader2 className="h-8 w-8 text-blue-600 animate-spin mb-2" />
+                            <p className="text-sm text-gray-600">Uploading logo...</p>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                            <p className="text-sm text-gray-600 mb-2">
+                              No logo uploaded yet
+                            </p>
+                            <p className="text-xs text-gray-500 mb-4">
+                              PNG, JPG, GIF up to 10MB
+                            </p>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleLogoUpload}
+                              disabled={isUploadingLogo}
+                              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t">

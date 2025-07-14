@@ -14,6 +14,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Performance optimizations for large datasets
 
+## [2.2.0] - 2024-01-25
+
+### Added
+- **Logo Upload Management**: Super admins can now upload, replace, and remove site logos
+- Logo upload functionality with Cloudinary integration for secure cloud storage
+- Real-time logo preview and management in site settings
+- File validation for logo uploads (PNG, JPG, GIF up to 10MB)
+- Logo thumbnails display in sites list for improved visual hierarchy
+- Drag-and-drop logo upload interface with progress indicators
+- `logoUrl` field added to Site database model for logo storage
+- Logo removal functionality with automatic database cleanup
+
+### Changed
+- Site settings page enhanced with comprehensive logo management section
+- Sites list now displays logo thumbnails with Building2 fallback icons
+- `getSitePackageInfo` and `getAllSitesPackageInfo` functions updated to include logoUrl
+- Site and SitePackageInfo TypeScript interfaces updated with logoUrl field
+
+### Enhanced
+- Mobile-responsive logo upload interface with touch-friendly design
+- Loading states and error handling for logo operations
+- Automatic UI refresh after successful logo uploads or removals
+- Professional styling with visual feedback for upload states
+
 ## [2.1.0] - 2024-01-20
 
 ### Added

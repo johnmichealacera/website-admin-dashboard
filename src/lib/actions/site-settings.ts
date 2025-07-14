@@ -30,6 +30,7 @@ export async function getSitePackageInfo(siteId: string) {
       select: {
         id: true,
         name: true,
+        logoUrl: true,
         packageType: true,
         features: true,
         updatedAt: true
@@ -54,6 +55,7 @@ export async function getAllSitesPackageInfo() {
         id: true,
         name: true,
         domain: true,
+        logoUrl: true,
         packageType: true,
         features: true,
         isActive: true,
@@ -74,5 +76,31 @@ export async function getAllSitesPackageInfo() {
   } catch (error) {
     console.error('Error fetching all sites package info:', error)
     return { success: false, error: 'Failed to fetch sites package info' }
+  }
+}
+
+export async function updateSiteLogo(siteId: string, logoUrl: string | null) {
+  try {
+    const updatedSite = await db.site.update({
+      where: { id: siteId },
+      data: {
+        logoUrl: logoUrl,
+        updatedAt: new Date()
+      },
+      select: {
+        id: true,
+        name: true,
+        logoUrl: true,
+        packageType: true,
+        features: true,
+        updatedAt: true
+      }
+    })
+
+    revalidatePath('/admin/settings')
+    return { success: true, site: updatedSite as SitePackageInfo }
+  } catch (error) {
+    console.error('Error updating site logo:', error)
+    return { success: false, error: 'Failed to update site logo' }
   }
 }
