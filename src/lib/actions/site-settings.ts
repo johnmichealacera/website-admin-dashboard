@@ -138,6 +138,18 @@ export async function updateClientSiteSettings(data: ClientSiteUpdateData) {
       return { success: false, error: `You can select maximum ${limits.max} features for your ${currentSite.packageType.toLowerCase()} package` }
     }
 
+    // Validate color palette (should have exactly 3 colors)
+    if (data.colorPalette.length !== 3) {
+      return { success: false, error: 'Color palette must have exactly 3 colors' }
+    }
+
+    // Validate hex color format
+    const hexColorRegex = /^#[0-9A-F]{6}$/i
+    const invalidColors = data.colorPalette.filter(color => !hexColorRegex.test(color))
+    if (invalidColors.length > 0) {
+      return { success: false, error: 'All colors must be valid hex colors (e.g., #FF0000)' }
+    }
+
     // Ensure DASHBOARD is always included and first in both arrays
     const features = [SiteFeature.DASHBOARD, ...nonDashboardFeatures]
     const featuresOrder = [SiteFeature.DASHBOARD, ...data.featuresOrder.filter(f => f !== SiteFeature.DASHBOARD)]
@@ -148,6 +160,7 @@ export async function updateClientSiteSettings(data: ClientSiteUpdateData) {
         name: data.name.trim(),
         features: features,
         featuresOrder: featuresOrder,
+        colorPalette: data.colorPalette,
         updatedAt: new Date()
       },
       select: {
@@ -155,6 +168,7 @@ export async function updateClientSiteSettings(data: ClientSiteUpdateData) {
         name: true,
         features: true,
         featuresOrder: true,
+        colorPalette: true,
         packageType: true,
         updatedAt: true
       }
@@ -178,6 +192,7 @@ export async function getClientSiteSettings(siteId: string) {
         name: true,
         features: true,
         featuresOrder: true,
+        colorPalette: true,
         packageType: true,
         updatedAt: true
       }
@@ -193,6 +208,7 @@ export async function getClientSiteSettings(siteId: string) {
       name: site.name,
       features: site.features as SiteFeature[],
       featuresOrder: site.featuresOrder as SiteFeature[],
+      colorPalette: site.colorPalette,
       packageType: site.packageType,
       updatedAt: site.updatedAt
     }

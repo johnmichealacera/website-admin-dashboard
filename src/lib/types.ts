@@ -13,6 +13,7 @@ export interface SitePackageInfo {
   packageType?: SitePackage
   features?: SiteFeature[]
   featuresOrder?: SiteFeature[]
+  colorPalette?: string[]
   isActive?: boolean
   updatedAt: Date
   _count?: {
@@ -58,6 +59,7 @@ export interface Site {
   packageType: SitePackage
   features: SiteFeature[]
   featuresOrder: SiteFeature[]
+  colorPalette: string[]
   createdAt: Date
   updatedAt: Date
 }
@@ -224,6 +226,7 @@ export interface ClientSiteSettingsData {
   name: string
   features: SiteFeature[]
   featuresOrder: SiteFeature[]
+  colorPalette: string[]
 }
 
 export interface ClientSiteUpdateData {
@@ -231,6 +234,7 @@ export interface ClientSiteUpdateData {
   name: string
   features: SiteFeature[]
   featuresOrder: SiteFeature[]
+  colorPalette: string[]
 }
 
 export type UserFormData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>

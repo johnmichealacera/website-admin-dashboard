@@ -10,6 +10,7 @@ import { Settings, Save, Loader2, AlertCircle, CheckCircle, Edit3, ArrowUpDown, 
 import { useTenant } from '@/contexts/tenant-context'
 import { SiteFeature, ClientSiteSettingsData, SitePackage } from '@/lib/types'
 import { updateClientSiteSettings, getClientSiteSettings } from '@/lib/actions/site-settings'
+import { ColorPicker } from '@/components/ui/color-picker'
 
 // Available features that clients can choose from (excluding DASHBOARD which is always included)
 const AVAILABLE_FEATURES = [
@@ -36,7 +37,8 @@ export default function ClientSiteSettingsPage() {
   const [formData, setFormData] = useState<ClientSiteSettingsData>({
     name: '',
     features: [SiteFeature.DASHBOARD],
-    featuresOrder: [SiteFeature.DASHBOARD]
+    featuresOrder: [SiteFeature.DASHBOARD],
+    colorPalette: ['#3B82F6', '#10B981', '#F59E0B'] // Default colors
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -60,7 +62,8 @@ export default function ClientSiteSettingsPage() {
       const settings: ClientSiteSettingsData = {
         name: result.site.name,
         features: result.site.features || [SiteFeature.DASHBOARD],
-        featuresOrder: result.site.featuresOrder || [SiteFeature.DASHBOARD]
+        featuresOrder: result.site.featuresOrder || [SiteFeature.DASHBOARD],
+        colorPalette: result.site.colorPalette || ['#3B82F6', '#10B981', '#F59E0B']
       }
       setSiteSettings(settings)
       setFormData(settings)
@@ -133,7 +136,8 @@ export default function ClientSiteSettingsPage() {
       siteId: currentSite.id,
       name: formData.name,
       features: formData.features,
-      featuresOrder: formData.featuresOrder
+      featuresOrder: formData.featuresOrder,
+      colorPalette: formData.colorPalette
     })
 
     if (result.success) {
@@ -159,7 +163,8 @@ export default function ClientSiteSettingsPage() {
   const hasChanges = siteSettings && (
     formData.name !== siteSettings.name ||
     JSON.stringify(formData.features.sort()) !== JSON.stringify(siteSettings.features.sort()) ||
-    JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder)
+    JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder) ||
+    JSON.stringify(formData.colorPalette) !== JSON.stringify(siteSettings.colorPalette)
   )
 
   // Debug logging (remove in production)
@@ -168,8 +173,9 @@ export default function ClientSiteSettingsPage() {
     nameChanged: siteSettings ? formData.name !== siteSettings.name : false,
     featuresChanged: siteSettings ? JSON.stringify(formData.features.sort()) !== JSON.stringify(siteSettings.features.sort()) : false,
     orderChanged: siteSettings ? JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder) : false,
+    colorsChanged: siteSettings ? JSON.stringify(formData.colorPalette) !== JSON.stringify(siteSettings.colorPalette) : false,
     remainingSlots,
-    canSave: !isSubmitting && formData.name.trim() !== '' && remainingSlots === 0 && hasChanges
+    canSave: !isSubmitting && formData.name.trim() !== '' && hasMinimumFeatures && hasChanges
   })
 
   // Button should be enabled when:
@@ -252,7 +258,7 @@ export default function ClientSiteSettingsPage() {
               <span>Site Information</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div>
               <Label htmlFor="siteName">Site Name</Label>
               <Input
@@ -266,6 +272,60 @@ export default function ClientSiteSettingsPage() {
               <p className="text-sm text-gray-500 mt-1">
                 This is the name that appears in your dashboard and navigation.
               </p>
+            </div>
+
+            {/* Color Palette Section */}
+            <div>
+              <div className="flex items-center space-x-2 mb-3">
+                <div className="w-5 h-5 rounded bg-gradient-to-r from-blue-500 via-green-500 to-amber-500"></div>
+                <Label className="text-base font-medium">Color Palette</Label>
+              </div>
+              <p className="text-sm text-gray-500 mb-4">
+                Choose 3 colors that represent your brand. These will be used throughout your website.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <ColorPicker
+                  value={formData.colorPalette[0]}
+                  onChange={(color) => {
+                    const newPalette = [...formData.colorPalette]
+                    newPalette[0] = color
+                    setFormData(prev => ({ ...prev, colorPalette: newPalette }))
+                  }}
+                  label="Primary Color"
+                />
+                <ColorPicker
+                  value={formData.colorPalette[1]}
+                  onChange={(color) => {
+                    const newPalette = [...formData.colorPalette]
+                    newPalette[1] = color
+                    setFormData(prev => ({ ...prev, colorPalette: newPalette }))
+                  }}
+                  label="Secondary Color"
+                />
+                <ColorPicker
+                  value={formData.colorPalette[2]}
+                  onChange={(color) => {
+                    const newPalette = [...formData.colorPalette]
+                    newPalette[2] = color
+                    setFormData(prev => ({ ...prev, colorPalette: newPalette }))
+                  }}
+                  label="Accent Color"
+                />
+              </div>
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                <div className="flex items-center space-x-3">
+                  {formData.colorPalette.map((color, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <div
+                        className="w-6 h-6 rounded-full border border-gray-300"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="text-xs font-mono text-gray-600">{color}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
