@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "LocalWebVentures Admin Dashboard",
   description: "LocalWebVentures Admin Dashboard",
+  icons: {
+    icon: "/localwebventures-logo.png",
+  },
 };
 
 export default function RootLayout({

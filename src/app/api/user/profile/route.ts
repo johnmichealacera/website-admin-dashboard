@@ -33,6 +33,7 @@ export async function GET() {
                 isActive: true,
                 packageType: true,
                 features: true,
+                featuresOrder: true,
                 createdAt: true,
                 updatedAt: true
               }
@@ -67,6 +68,7 @@ export async function GET() {
                   isActive: true,
                   packageType: true,
                   features: true,
+                  featuresOrder: true,
                   createdAt: true,
                   updatedAt: true
                 }

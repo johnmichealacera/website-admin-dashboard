@@ -1,6 +1,9 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChart3, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
+import { Logo } from '@/components/logo'
 
 export default function LoginPage() {
   return (
@@ -8,8 +11,8 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <BarChart3 className="h-8 w-8 text-blue-600" />
-            <span className="ml-2 text-2xl font-bold text-gray-900">Admin Panel</span>
+            <Logo size="md" className="mr-2" />
+            <span className="text-2xl font-bold text-gray-900">LocalWebVentures</span>
           </div>
           <CardTitle className="text-2xl text-center">Admin Login</CardTitle>
           <p className="text-sm text-gray-600 text-center">

@@ -27,19 +27,20 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (currentSite?.id && currentSite.features) {
+    if (currentSite?.id && currentSite.featuresOrder) {
       getDynamicMetrics()
     }
-  }, [currentSite?.id, currentSite?.features])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSite?.id, currentSite?.featuresOrder])
 
   const getDynamicMetrics = async () => {
-    if (!currentSite?.id || !currentSite.features) return
+    if (!currentSite?.id || !currentSite.featuresOrder) return
 
     try {
       setLoading(true)
       
       // Get the first 4 features after DASHBOARD
-      const availableFeatures = currentSite.features
+      const availableFeatures = currentSite.featuresOrder
         .filter(feature => feature !== SiteFeature.DASHBOARD)
         .slice(0, 4)
 

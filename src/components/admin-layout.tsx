@@ -7,6 +7,7 @@ import { useUser } from '@auth0/nextjs-auth0'
 import { useTenant } from '@/contexts/tenant-context'
 import { SiteFeature } from '@/lib/types'
 import { isFeatureAvailable } from '@/lib/utils/site-features'
+import { Logo } from '@/components/logo'
 import { 
   Package, 
   Tags, 
@@ -15,7 +16,6 @@ import {
   Home, 
   Menu, 
   X,
-  BarChart3,
   Calendar,
   Sparkles,
   LogOut,
@@ -122,7 +122,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <div className="mx-auto mb-4 opacity-60">
+            <Logo size="lg" />
+          </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">No Site Access</h2>
           <p className="text-gray-600 mb-4">
             You don&apos;t have access to any sites yet. Please contact your administrator to get access.
@@ -200,10 +202,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex h-16 items-center justify-between px-6 border-b">
-          <div className="flex items-center space-x-2">
-            <BarChart3 className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">Admin Panel</span>
+        <div className="flex h-16 items-center justify-between px-4 sm:px-6 border-b bg-white">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <Logo size="md" />
+            <div className="flex flex-col min-w-0">
+              <span className="text-base sm:text-lg md:text-xl font-bold text-gray-900 leading-tight truncate">
+                Admin Panel
+              </span>
+              <span className="text-xs text-gray-500 hidden sm:block font-medium truncate">
+                Local Web Ventures
+              </span>
+            </div>
           </div>
           <Button
             variant="ghost"
