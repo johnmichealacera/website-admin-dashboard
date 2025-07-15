@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { EventForm } from '@/components/forms/event-form'
-import { Plus, Calendar, Edit, Trash2, MapPin, Clock, Users, PhilippinePeso, Star } from 'lucide-react'
+import { Plus, Calendar, Edit, Trash2, MapPin, Clock, Star } from 'lucide-react'
 import { Event } from '@/lib/types'
 import { getEvents, deleteEvent } from '@/lib/actions/events'
 import { useTenant } from '@/contexts/tenant-context'
@@ -222,20 +222,6 @@ export default function EventsPage() {
                                 <div className="flex items-center space-x-2">
                                   <MapPin className="h-4 w-4" />
                                   <span>{event.location}</span>
-                                </div>
-                              )}
-                              
-                              {event.price && event.price > 0 && (
-                                <div className="flex items-center space-x-2">
-                                  <PhilippinePeso className="h-4 w-4" />
-                                  <span>₱{event.price.toFixed(2)}</span>
-                                </div>
-                              )}
-                              
-                              {event.maxAttendees && (
-                                <div className="flex items-center space-x-2">
-                                  <Users className="h-4 w-4" />
-                                  <span>Max {event.maxAttendees} attendees</span>
                                 </div>
                               )}
                             </div>

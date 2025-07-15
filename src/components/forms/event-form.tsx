@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { EventFormData } from '@/lib/types'
 import { createEvent, updateEvent } from '@/lib/actions/events'
-import { Loader2, Calendar, MapPin, Users, PhilippinePeso, Phone, Mail, Globe, Upload, X } from 'lucide-react'
+import { Loader2, Calendar, MapPin, Upload, X } from 'lucide-react'
 import { handleFileChange } from "@jmacera/cloudinary-image-upload";
 import Image from 'next/image'
 import { useTenant } from '@/contexts/tenant-context'
@@ -308,42 +308,6 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
             </div>
           </div>
 
-          {/* Pricing and Capacity */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center">
-              <PhilippinePeso className="h-5 w-5 mr-2" />
-              Pricing and Capacity
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="price">Price (₱)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                  placeholder="0.00"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="maxAttendees" className="flex items-center">
-                  <Users className="h-4 w-4 mr-1" />
-                  Max Attendees
-                </Label>
-                <Input
-                  id="maxAttendees"
-                  type="number"
-                  value={formData.maxAttendees || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, maxAttendees: e.target.value ? parseInt(e.target.value) : null }))}
-                  placeholder="Unlimited"
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Tags */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Tags</h3>
@@ -464,55 +428,6 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Contact Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Contact Information</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="contactEmail" className="flex items-center">
-                  <Mail className="h-4 w-4 mr-1" />
-                  Contact Email
-                </Label>
-                <Input
-                  id="contactEmail"
-                  type="email"
-                  value={formData.contactEmail || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
-                  placeholder="Enter contact email"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="contactPhone" className="flex items-center">
-                  <Phone className="h-4 w-4 mr-1" />
-                  Contact Phone
-                </Label>
-                <Input
-                  id="contactPhone"
-                  type="tel"
-                  value={formData.contactPhone || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
-                  placeholder="Enter contact phone"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="websiteUrl" className="flex items-center">
-                <Globe className="h-4 w-4 mr-1" />
-                Website URL
-              </Label>
-              <Input
-                id="websiteUrl"
-                type="url"
-                value={formData.websiteUrl || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, websiteUrl: e.target.value }))}
-                placeholder="https://example.com"
-              />
-            </div>
           </div>
 
           {/* Settings */}
