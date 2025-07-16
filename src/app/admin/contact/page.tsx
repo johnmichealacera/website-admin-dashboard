@@ -9,6 +9,8 @@ import { Phone, Loader2, Mail, Globe } from 'lucide-react'
 import { Contact, ContactFormData } from '@/lib/types'
 import { getContact, createOrUpdateContact } from '@/lib/actions/contact'
 import { useTenant } from '@/contexts/tenant-context'
+import { ProductFeatureDescription as FeatureDescriptionConfig } from '@/components/forms/product-feature-description';
+import { SiteFeature } from '@/lib/types';
 
 export default function ContactPage() {
   const { currentSite } = useTenant()
@@ -159,6 +161,16 @@ export default function ContactPage() {
           </Button>
         )}
       </div>
+
+      {/* Feature Description Config */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Contact Feature Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FeatureDescriptionConfig siteId={currentSite.id} featureName={SiteFeature.CONTACT} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

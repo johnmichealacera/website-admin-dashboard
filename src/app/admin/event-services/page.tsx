@@ -10,6 +10,8 @@ import { useTenant } from '@/contexts/tenant-context'
 import { EventService } from '@/lib/types'
 import { getEventServices, deleteEventService, toggleEventServiceStatus } from '@/lib/actions/event-services'
 import Link from 'next/link'
+import { ProductFeatureDescription as FeatureDescriptionConfig } from '@/components/forms/product-feature-description';
+import { SiteFeature } from '@/lib/types';
 
 export default function EventServicesPage() {
   const { currentSite } = useTenant()
@@ -103,15 +105,26 @@ export default function EventServicesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Event Services</h1>
-          <p className="text-gray-600">Manage your event service packages and offerings</p>
+          <p className="text-sm text-gray-500">
+            Manage your event services for {currentSite.name}
+          </p>
         </div>
         <Link href="/admin/event-services/new">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
-            Add Service
+            Add Event Service
           </Button>
         </Link>
       </div>
+      {/* Feature Description Config */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Event Services Feature Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FeatureDescriptionConfig siteId={currentSite.id} featureName={SiteFeature.EVENT_SERVICES} />
+        </CardContent>
+      </Card>
 
       {/* Search and Filter */}
       <Card>

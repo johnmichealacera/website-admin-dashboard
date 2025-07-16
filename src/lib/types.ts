@@ -11,7 +11,7 @@ export interface SitePackageInfo {
   domain?: string
   logoUrl?: string | null
   packageType?: SitePackage
-  features?: SiteFeature[]
+  features?: SiteFeatureData[]
   featuresOrder?: SiteFeature[]
   colorPalette?: string[]
   isActive?: boolean
@@ -57,7 +57,7 @@ export interface Site {
   logoUrl: string | null
   isActive: boolean
   packageType: SitePackage
-  features: SiteFeature[]
+  features: SiteFeatureData[]
   featuresOrder: SiteFeature[]
   colorPalette: string[]
   createdAt: Date
@@ -222,21 +222,27 @@ export type EventServiceFormData = Omit<EventService, 'id' | 'createdAt' | 'upda
 export type SiteFormData = Omit<Site, 'id' | 'createdAt' | 'updatedAt'>
 
 // Client Site Settings Types (for regular admins)
+export interface SiteFeatureData {
+  siteId: string;
+  name: FeatureName;
+  description: string;
+}
+
 export interface ClientSiteSettingsData {
-  name: string
-  description: string | null
-  features: SiteFeature[]
-  featuresOrder: SiteFeature[]
-  colorPalette: string[]
+  name: string;
+  description: string | null;
+  features: SiteFeatureData[];
+  featuresOrder: FeatureName[];
+  colorPalette: string[];
 }
 
 export interface ClientSiteUpdateData {
-  siteId: string
-  name: string
-  description: string | null
-  features: SiteFeature[]
-  featuresOrder: SiteFeature[]
-  colorPalette: string[]
+  siteId: string;
+  name: string;
+  description: string | null;
+  features: SiteFeatureData[];
+  featuresOrder: FeatureName[];
+  colorPalette: string[];
 }
 
 export type UserFormData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>
@@ -252,13 +258,13 @@ export interface TenantContext {
 // Site package form data types
 export interface SitePackageFormData {
   packageType: SitePackage
-  features: SiteFeature[]
+  features: SiteFeatureData[]
 }
 
 export interface SitePackageUpdateData {
   siteId: string
   packageType: SitePackage
-  features: SiteFeature[]
+  features: SiteFeatureData[]
 }
 
 // API Response types
@@ -287,3 +293,6 @@ export interface DashboardStats {
   totalValue: number
   siteName: string
 } 
+
+// Temporary alias for feature name type
+export type FeatureName = SiteFeature; 

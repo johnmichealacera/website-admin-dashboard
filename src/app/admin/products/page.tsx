@@ -9,6 +9,8 @@ import { ProductWithCategory } from '@/lib/types'
 import { getProducts, deleteProduct } from '@/lib/actions/products'
 import { formatPrice, formatDate } from '@/lib/utils'
 import { useTenant } from '@/contexts/tenant-context'
+import { ProductFeatureDescription } from '@/components/forms/product-feature-description';
+import { SiteFeature } from '@/lib/types';
 
 export default function ProductsPage() {
   const { currentSite } = useTenant()
@@ -121,6 +123,15 @@ export default function ProductsPage() {
           Add Product
         </Button>
       </div>
+      {/* Feature Description Config */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Product Feature Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProductFeatureDescription siteId={currentSite.id} featureName={SiteFeature.PRODUCTS} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

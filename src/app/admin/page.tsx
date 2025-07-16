@@ -225,14 +225,14 @@ export default function AdminDashboard() {
                     </p>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {currentSite.features
-                        .filter(feature => feature !== SiteFeature.DASHBOARD)
+                        .filter(feature => feature.name !== SiteFeature.DASHBOARD)
                         .slice(4)
                         .map(feature => (
                           <span
-                            key={feature}
+                            key={feature.name}
                             className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
                           >
-                            {feature.toLowerCase().replace('_', ' ')}
+                            {feature.name.toLowerCase().replace('_', ' ')}
                           </span>
                         ))}
                     </div>
@@ -286,13 +286,13 @@ export default function AdminDashboard() {
                       <h3 className="font-semibold">Available Features</h3>
                       <div className="flex flex-wrap gap-2">
                         {currentSite.features
-                          .filter(feature => feature !== SiteFeature.DASHBOARD)
+                          .filter(feature => feature.name !== SiteFeature.DASHBOARD)
                           .map(feature => (
                             <span
-                              key={feature}
+                              key={feature.name}
                               className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs"
                             >
-                              {feature.toLowerCase().replace('_', ' ')}
+                              {feature.name.toLowerCase().replace('_', ' ')}
                             </span>
                           ))}
                       </div>

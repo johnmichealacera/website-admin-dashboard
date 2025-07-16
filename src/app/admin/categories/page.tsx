@@ -9,6 +9,8 @@ import { CategoryWithProducts } from '@/lib/types'
 import { getCategories, deleteCategory } from '@/lib/actions/categories'
 import { formatDate } from '@/lib/utils'
 import { useTenant } from '@/contexts/tenant-context'
+import { ProductFeatureDescription as FeatureDescriptionConfig } from '@/components/forms/product-feature-description';
+import { SiteFeature } from '@/lib/types';
 
 export default function CategoriesPage() {
   const { currentSite } = useTenant()
@@ -116,7 +118,7 @@ export default function CategoriesPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
           <p className="text-sm text-gray-500">
-            Manage your product categories for {currentSite.name}
+            Organize your products into categories for {currentSite.name}
           </p>
         </div>
         <Button onClick={handleAddCategory}>
@@ -124,6 +126,15 @@ export default function CategoriesPage() {
           Add Category
         </Button>
       </div>
+      {/* Feature Description Config */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Categories Feature Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FeatureDescriptionConfig siteId={currentSite.id} featureName={SiteFeature.CATEGORIES} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

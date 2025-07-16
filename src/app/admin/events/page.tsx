@@ -8,6 +8,8 @@ import { Plus, Calendar, Edit, Trash2, MapPin, Clock, Star } from 'lucide-react'
 import { Event } from '@/lib/types'
 import { getEvents, deleteEvent } from '@/lib/actions/events'
 import { useTenant } from '@/contexts/tenant-context'
+import { ProductFeatureDescription as FeatureDescriptionConfig } from '@/components/forms/product-feature-description';
+import { SiteFeature } from '@/lib/types';
 
 export default function EventsPage() {
   const { currentSite } = useTenant()
@@ -129,7 +131,7 @@ export default function EventsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Events</h1>
           <p className="text-sm text-gray-500">
-            Manage your business events and activities for {currentSite.name}
+            Manage your events for {currentSite.name}
           </p>
         </div>
         <Button onClick={handleAddEvent}>
@@ -137,6 +139,15 @@ export default function EventsPage() {
           Add Event
         </Button>
       </div>
+      {/* Feature Description Config */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Events Feature Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FeatureDescriptionConfig siteId={currentSite.id} featureName={SiteFeature.EVENTS} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

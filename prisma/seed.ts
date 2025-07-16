@@ -24,7 +24,15 @@ async function main() {
       description: 'Professional event planning and styling services for weddings, birthdays, and corporate functions.',
       isActive: true,
       packageType: 'PREMIUM',
-      features: ['DASHBOARD', 'EVENTS', 'EVENT_SERVICES', 'ABOUT', 'CONTACT'],
+      features: {
+        create: [
+          { name: "DASHBOARD", description: "Dashboard feature" },
+          { name: "EVENTS", description: "Events feature" },
+          { name: "EVENT_SERVICES", description: "Event services feature" },
+          { name: "ABOUT", description: "About feature" },
+          { name: "CONTACT", description: "Contact feature" }
+        ]
+      },
     },
   })
 

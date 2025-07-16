@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Settings, Package, Shield, Building2, AlertCircle, Save, Loader2, Upload, X } from 'lucide-react'
 import { useTenant } from '@/contexts/tenant-context'
-import { SitePackage, SiteFeature, SitePackageFormData, SitePackageInfo } from '@/lib/types'
+import { SitePackage, SiteFeature, SitePackageFormData, SitePackageInfo, SiteFeatureData } from '@/lib/types'
 import { updateSitePackage, getSitePackageInfo, getAllSitesPackageInfo, updateSiteLogo } from '@/lib/actions/site-settings'
 import { PACKAGE_FEATURES } from '@/lib/utils/site-features'
 import { handleFileChange } from "@jmacera/cloudinary-image-upload";
@@ -20,7 +20,7 @@ export default function SiteSettingsPage() {
   const [selectedSite, setSelectedSite] = useState<SitePackageInfo | null>(null)
   const [formData, setFormData] = useState<SitePackageFormData>({
     packageType: SitePackage.BASIC,
-    features: [SiteFeature.DASHBOARD]
+    features: [{ siteId: currentSite?.id || '', name: SiteFeature.DASHBOARD, description: '' }]
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isUploadingLogo, setIsUploadingLogo] = useState(false)
@@ -60,7 +60,7 @@ export default function SiteSettingsPage() {
       setSelectedSite(site || null)
       setFormData({
         packageType: site?.packageType as SitePackage,
-        features: site?.features as SiteFeature[]
+        features: site?.features || [],
       })
     } else {
       setError(result.error || 'Failed to load site package info')
@@ -73,7 +73,7 @@ export default function SiteSettingsPage() {
       setSelectedSite(site)
       setFormData({
         packageType: site.packageType as SitePackage,
-        features: site.features as SiteFeature[]
+        features: site.features as SiteFeatureData[]
       })
     }
   }
@@ -82,7 +82,11 @@ export default function SiteSettingsPage() {
     const availableFeatures = PACKAGE_FEATURES[packageType]
     setFormData({
       packageType,
-      features: availableFeatures
+      features: availableFeatures.map(feature => ({
+        siteId: selectedSite?.id || '',
+        name: feature,
+        description: ''
+      }))
     })
   }
 
@@ -92,9 +96,13 @@ export default function SiteSettingsPage() {
 
     setFormData(prev => ({
       ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature]
+      features: prev.features.some(f => f.name === feature)
+        ? prev.features.filter(f => f.name !== feature)
+        : [...prev.features, {
+            siteId: selectedSite?.id || '',
+            name: feature,
+            description: ''
+          }]
     }))
   }
 
@@ -343,7 +351,7 @@ export default function SiteSettingsPage() {
                     <div className="mt-2 grid grid-cols-2 gap-3">
                       {Object.values(SiteFeature).map((feature) => {
                         const isAvailable = PACKAGE_FEATURES[formData.packageType].includes(feature)
-                        const isSelected = formData.features.includes(feature)
+                        const isSelected = formData.features.some(f => f.name === feature)
                         
                         return (
                           <button
@@ -364,7 +372,7 @@ export default function SiteSettingsPage() {
                                 isSelected && isAvailable ? 'bg-blue-600' : 'bg-gray-300'
                               }`} />
                               <span className="font-medium">
-                                {feature.charAt(0) + feature.slice(1).toLowerCase()}
+                                {feature}
                               </span>
                             </div>
                             {!isAvailable && (
@@ -510,7 +518,7 @@ export default function SiteSettingsPage() {
               <div className="space-y-1">
                 {PACKAGE_FEATURES[SitePackage.BASIC].map(feature => (
                   <Badge key={feature} variant="secondary" className="text-xs">
-                    {feature.charAt(0) + feature.slice(1).toLowerCase()}
+                    {feature}
                   </Badge>
                 ))}
               </div>
@@ -521,7 +529,7 @@ export default function SiteSettingsPage() {
               <div className="space-y-1">
                 {PACKAGE_FEATURES[SitePackage.STANDARD].map(feature => (
                   <Badge key={feature} variant="secondary" className="text-xs">
-                    {feature.charAt(0) + feature.slice(1).toLowerCase()}
+                    {feature}
                   </Badge>
                 ))}
               </div>
@@ -532,7 +540,7 @@ export default function SiteSettingsPage() {
               <div className="space-y-1">
                 {PACKAGE_FEATURES[SitePackage.PREMIUM].map(feature => (
                   <Badge key={feature} variant="secondary" className="text-xs">
-                    {feature.charAt(0) + feature.slice(1).toLowerCase()}
+                    {feature}
                   </Badge>
                 ))}
               </div>
@@ -543,7 +551,7 @@ export default function SiteSettingsPage() {
               <div className="space-y-1">
                 {PACKAGE_FEATURES[SitePackage.ENTERPRISE].map(feature => (
                   <Badge key={feature} variant="secondary" className="text-xs">
-                    {feature.charAt(0) + feature.slice(1).toLowerCase()}
+                    {feature}
                   </Badge>
                 ))}
               </div>

@@ -32,7 +32,7 @@ export async function GET() {
                 description: true,
                 isActive: true,
                 packageType: true,
-                features: true,
+                features: { select: { name: true, description: true } },
                 featuresOrder: true,
                 createdAt: true,
                 updatedAt: true
@@ -67,7 +67,7 @@ export async function GET() {
                   description: true,
                   isActive: true,
                   packageType: true,
-                  features: true,
+                  features: { select: { name: true, description: true } },
                   featuresOrder: true,
                   createdAt: true,
                   updatedAt: true
@@ -99,7 +99,7 @@ export async function GET() {
                   description: true,
                   isActive: true,
                   packageType: true,
-                  features: true,
+                  features: { select: { name: true, description: true } },
                   createdAt: true,
                   updatedAt: true
                 }

@@ -162,7 +162,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     
     // Check if feature is available for current site
     if (item.feature && currentSite?.features) {
-      return isFeatureAvailable(currentSite.features, item.feature)
+      return isFeatureAvailable(currentSite.features.map(feature => feature.name), item.feature)
     }
     
     return false

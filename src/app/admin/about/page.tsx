@@ -10,6 +10,8 @@ import { FileText, Loader2 } from 'lucide-react'
 import { About, AboutFormData } from '@/lib/types'
 import { getAbout, createOrUpdateAbout } from '@/lib/actions/about'
 import { useTenant } from '@/contexts/tenant-context'
+import { ProductFeatureDescription as FeatureDescriptionConfig } from '@/components/forms/product-feature-description';
+import { SiteFeature } from '@/lib/types';
 
 export default function AboutPage() {
   const { currentSite } = useTenant()
@@ -133,7 +135,7 @@ export default function AboutPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">About Us</h1>
           <p className="text-sm text-gray-500">
-            Manage your business information for {currentSite.name}
+            Manage your about information for {currentSite.name}
           </p>
         </div>
         {!isEditing && (
@@ -143,6 +145,16 @@ export default function AboutPage() {
           </Button>
         )}
       </div>
+
+      {/* Feature Description Config */}
+      <Card>
+        <CardHeader>
+          <CardTitle>About Feature Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FeatureDescriptionConfig siteId={currentSite.id} featureName={SiteFeature.ABOUT} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

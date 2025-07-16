@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Settings, Save, Loader2, AlertCircle, CheckCircle, Edit3, ArrowUpDown, GripVertical } from 'lucide-react'
 import { useTenant } from '@/contexts/tenant-context'
-import { SiteFeature, ClientSiteSettingsData, SitePackage } from '@/lib/types'
+import { SiteFeature, ClientSiteSettingsData, SitePackage, FeatureName } from '@/lib/types'
 import { updateClientSiteSettings, getClientSiteSettings } from '@/lib/actions/site-settings'
 import { ColorPicker } from '@/components/ui/color-picker'
 
@@ -35,12 +35,13 @@ export default function ClientSiteSettingsPage() {
   const { currentSite } = useTenant()
   const [siteSettings, setSiteSettings] = useState<ClientSiteSettingsData | null>(null)
   const [sitePackage, setSitePackage] = useState<SitePackage>(SitePackage.BASIC)
+  // Update formData and siteSettings to use array of { name, description } objects
   const [formData, setFormData] = useState<ClientSiteSettingsData>({
     name: '',
-    description: null,
-    features: [SiteFeature.DASHBOARD],
+    description: '',
+    features: [{ siteId: currentSite?.id || '', name: SiteFeature.DASHBOARD, description: '' }],
     featuresOrder: [SiteFeature.DASHBOARD],
-    colorPalette: ['#3B82F6', '#10B981', '#F59E0B'] // Default colors
+    colorPalette: ['#3B82F6', '#10B981', '#F59E0B']
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -64,8 +65,8 @@ export default function ClientSiteSettingsPage() {
       const settings: ClientSiteSettingsData = {
         name: result.site.name,
         description: result.site.description,
-        features: result.site.features || [SiteFeature.DASHBOARD],
-        featuresOrder: result.site.featuresOrder || [SiteFeature.DASHBOARD],
+        features: result.site.features || [{ siteId: currentSite?.id || '', name: SiteFeature.DASHBOARD, description: '' }],
+        featuresOrder: result.site.featuresOrder as FeatureName[],
         colorPalette: result.site.colorPalette || ['#3B82F6', '#10B981', '#F59E0B']
       }
       setSiteSettings(settings)
@@ -79,25 +80,22 @@ export default function ClientSiteSettingsPage() {
 
   const handleFeatureToggle = (feature: SiteFeature) => {
     if (feature === SiteFeature.DASHBOARD) return // Dashboard can't be toggled
-
-    const isSelected = formData.features.includes(feature)
-    
+    const isSelected = formData.features.some(f => f.name === feature)
     if (isSelected) {
       // Remove feature
-      const newFeatures = formData.features.filter(f => f !== feature)
+      const newFeatures = formData.features.filter(f => f.name !== feature)
       const newOrder = formData.featuresOrder.filter(f => f !== feature)
-      setFormData(prev => ({ 
-        ...prev, 
+      setFormData(prev => ({
+        ...prev,
         features: newFeatures,
         featuresOrder: newOrder
       }))
     } else {
-      // Add feature (only if we haven't reached the package limit)
       if (canAddMore) {
-        const newFeatures = [...formData.features, feature]
+        const newFeatures = [...formData.features, { siteId: currentSite?.id || '', name: feature, description: '' }]
         const newOrder = [...formData.featuresOrder, feature]
-        setFormData(prev => ({ 
-          ...prev, 
+        setFormData(prev => ({
+          ...prev,
           features: newFeatures,
           featuresOrder: newOrder
         }))
@@ -156,7 +154,7 @@ export default function ClientSiteSettingsPage() {
     setIsSubmitting(false)
   }
 
-  const nonDashboardFeatures = formData.features.filter(f => f !== SiteFeature.DASHBOARD)
+  const nonDashboardFeatures = formData.features.filter(f => f.name !== SiteFeature.DASHBOARD)
   const packageLimits = PACKAGE_FEATURE_LIMITS[sitePackage]
   const currentFeatureCount = nonDashboardFeatures.length
   const canAddMore = currentFeatureCount < packageLimits.max
@@ -167,7 +165,7 @@ export default function ClientSiteSettingsPage() {
   const hasChanges = siteSettings && (
     formData.name !== siteSettings.name ||
     formData.description !== siteSettings.description ||
-    JSON.stringify(formData.features.sort()) !== JSON.stringify(siteSettings.features.sort()) ||
+    JSON.stringify(formData.features.map(f => f.name).sort()) !== JSON.stringify(siteSettings.features.map(f => f.name).sort()) ||
     JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder) ||
     JSON.stringify(formData.colorPalette) !== JSON.stringify(siteSettings.colorPalette)
   )
@@ -176,7 +174,7 @@ export default function ClientSiteSettingsPage() {
   console.log('Site Settings Debug:', {
     hasChanges,
     nameChanged: siteSettings ? formData.name !== siteSettings.name : false,
-    featuresChanged: siteSettings ? JSON.stringify(formData.features.sort()) !== JSON.stringify(siteSettings.features.sort()) : false,
+    featuresChanged: siteSettings ? JSON.stringify(formData.features.map(f => f.name).sort()) !== JSON.stringify(siteSettings.features.map(f => f.name).sort()) : false,
     orderChanged: siteSettings ? JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder) : false,
     colorsChanged: siteSettings ? JSON.stringify(formData.colorPalette) !== JSON.stringify(siteSettings.colorPalette) : false,
     remainingSlots,
@@ -391,7 +389,7 @@ export default function ClientSiteSettingsPage() {
 
               {/* Available Features */}
               {AVAILABLE_FEATURES.map((item) => {
-                const isSelected = formData.features.includes(item.feature)
+                const isSelected = formData.features.some(f => f.name === item.feature)
                 const canSelect = !isSelected && canAddMore
                 
                 return (
