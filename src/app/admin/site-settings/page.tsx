@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Settings, Save, Loader2, AlertCircle, CheckCircle, Edit3, ArrowUpDown, GripVertical } from 'lucide-react'
@@ -36,6 +37,7 @@ export default function ClientSiteSettingsPage() {
   const [sitePackage, setSitePackage] = useState<SitePackage>(SitePackage.BASIC)
   const [formData, setFormData] = useState<ClientSiteSettingsData>({
     name: '',
+    description: null,
     features: [SiteFeature.DASHBOARD],
     featuresOrder: [SiteFeature.DASHBOARD],
     colorPalette: ['#3B82F6', '#10B981', '#F59E0B'] // Default colors
@@ -61,6 +63,7 @@ export default function ClientSiteSettingsPage() {
     if (result.success && result.site) {
       const settings: ClientSiteSettingsData = {
         name: result.site.name,
+        description: result.site.description,
         features: result.site.features || [SiteFeature.DASHBOARD],
         featuresOrder: result.site.featuresOrder || [SiteFeature.DASHBOARD],
         colorPalette: result.site.colorPalette || ['#3B82F6', '#10B981', '#F59E0B']
@@ -135,6 +138,7 @@ export default function ClientSiteSettingsPage() {
     const result = await updateClientSiteSettings({
       siteId: currentSite.id,
       name: formData.name,
+      description: formData.description,
       features: formData.features,
       featuresOrder: formData.featuresOrder,
       colorPalette: formData.colorPalette
@@ -162,6 +166,7 @@ export default function ClientSiteSettingsPage() {
   // Check if there are any changes from the original settings
   const hasChanges = siteSettings && (
     formData.name !== siteSettings.name ||
+    formData.description !== siteSettings.description ||
     JSON.stringify(formData.features.sort()) !== JSON.stringify(siteSettings.features.sort()) ||
     JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder) ||
     JSON.stringify(formData.colorPalette) !== JSON.stringify(siteSettings.colorPalette)
@@ -271,6 +276,21 @@ export default function ClientSiteSettingsPage() {
               />
               <p className="text-sm text-gray-500 mt-1">
                 This is the name that appears in your dashboard and navigation.
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="siteDescription">Site Description</Label>
+              <Textarea
+                id="siteDescription"
+                value={formData.description || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value || null }))}
+                placeholder="Enter a brief description of your site (optional)"
+                className="mt-1"
+                rows={3}
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                A brief description that will be stored in your site settings.
               </p>
             </div>
 

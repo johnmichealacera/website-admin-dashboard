@@ -158,6 +158,7 @@ export async function updateClientSiteSettings(data: ClientSiteUpdateData) {
       where: { id: data.siteId },
       data: {
         name: data.name.trim(),
+        description: data.description?.trim() || null,
         features: features,
         featuresOrder: featuresOrder,
         colorPalette: data.colorPalette,
@@ -166,6 +167,7 @@ export async function updateClientSiteSettings(data: ClientSiteUpdateData) {
       select: {
         id: true,
         name: true,
+        description: true,
         features: true,
         featuresOrder: true,
         colorPalette: true,
@@ -190,6 +192,7 @@ export async function getClientSiteSettings(siteId: string) {
       select: {
         id: true,
         name: true,
+        description: true,
         features: true,
         featuresOrder: true,
         colorPalette: true,
@@ -206,6 +209,7 @@ export async function getClientSiteSettings(siteId: string) {
     const siteData = {
       id: site.id,
       name: site.name,
+      description: site.description,
       features: site.features as SiteFeature[],
       featuresOrder: site.featuresOrder as SiteFeature[],
       colorPalette: site.colorPalette,

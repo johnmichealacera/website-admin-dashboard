@@ -224,6 +224,7 @@ export type SiteFormData = Omit<Site, 'id' | 'createdAt' | 'updatedAt'>
 // Client Site Settings Types (for regular admins)
 export interface ClientSiteSettingsData {
   name: string
+  description: string | null
   features: SiteFeature[]
   featuresOrder: SiteFeature[]
   colorPalette: string[]
@@ -232,6 +233,7 @@ export interface ClientSiteSettingsData {
 export interface ClientSiteUpdateData {
   siteId: string
   name: string
+  description: string | null
   features: SiteFeature[]
   featuresOrder: SiteFeature[]
   colorPalette: string[]
