@@ -47,6 +47,21 @@ export enum SiteFeature {
   CONTACT = 'CONTACT'
 }
 
+// Hero model type
+export interface Hero {
+  id: string
+  title: string | null
+  subtitle: string | null
+  description: string | null
+  imageUrl: string | null
+  videoUrl: string | null
+  ctaButton: string | null
+  ctaLink: string | null
+  siteId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 // Multi-tenant model types
 export interface Site {
   id: string
@@ -60,6 +75,7 @@ export interface Site {
   features: SiteFeatureData[]
   featuresOrder: SiteFeature[]
   colorPalette: string[]
+  hero?: Hero | null
   createdAt: Date
   updatedAt: Date
 }

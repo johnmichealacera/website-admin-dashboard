@@ -34,6 +34,19 @@ export async function GET() {
                 packageType: true,
                 features: { select: { name: true, description: true } },
                 featuresOrder: true,
+                colorPalette: true,
+                hero: {
+                  select: {
+                    id: true,
+                    title: true,
+                    subtitle: true,
+                    description: true,
+                    imageUrl: true,
+                    videoUrl: true,
+                    ctaButton: true,
+                    ctaLink: true
+                  }
+                },
                 createdAt: true,
                 updatedAt: true
               }
@@ -69,6 +82,19 @@ export async function GET() {
                   packageType: true,
                   features: { select: { name: true, description: true } },
                   featuresOrder: true,
+                  colorPalette: true,
+                  hero: {
+                    select: {
+                      id: true,
+                      title: true,
+                      subtitle: true,
+                      description: true,
+                      imageUrl: true,
+                      videoUrl: true,
+                      ctaButton: true,
+                      ctaLink: true
+                    }
+                  },
                   createdAt: true,
                   updatedAt: true
                 }
@@ -100,6 +126,20 @@ export async function GET() {
                   isActive: true,
                   packageType: true,
                   features: { select: { name: true, description: true } },
+                  featuresOrder: true,
+                  colorPalette: true,
+                  hero: {
+                    select: {
+                      id: true,
+                      title: true,
+                      subtitle: true,
+                      description: true,
+                      imageUrl: true,
+                      videoUrl: true,
+                      ctaButton: true,
+                      ctaLink: true
+                    }
+                  },
                   createdAt: true,
                   updatedAt: true
                 }
