@@ -39,6 +39,7 @@ export enum SitePackage {
 
 export enum SiteFeature {
   DASHBOARD = 'DASHBOARD',
+  HERO = 'HERO',
   PRODUCTS = 'PRODUCTS',
   CATEGORIES = 'CATEGORIES',
   EVENTS = 'EVENTS',

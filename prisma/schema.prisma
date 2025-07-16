@@ -225,6 +225,7 @@ enum SitePackage {
 
 enum FeatureName {
   DASHBOARD
+  HERO
   PRODUCTS
   CATEGORIES
   EVENTS

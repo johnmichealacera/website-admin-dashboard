@@ -20,7 +20,8 @@ import {
   Sparkles,
   LogOut,
   User,
-  Settings
+  Settings,
+  Image
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SiteSelector } from '@/components/site-selector'
@@ -41,6 +42,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { href: '/admin', icon: Home, label: 'Dashboard', feature: SiteFeature.DASHBOARD },
+  { href: '/admin/hero', icon: Image, label: 'Hero Section', feature: SiteFeature.HERO },
   { href: '/admin/products', icon: Package, label: 'Products', feature: SiteFeature.PRODUCTS },
   { href: '/admin/categories', icon: Tags, label: 'Categories', feature: SiteFeature.CATEGORIES },
   { href: '/admin/events', icon: Calendar, label: 'Events', feature: SiteFeature.EVENTS },
