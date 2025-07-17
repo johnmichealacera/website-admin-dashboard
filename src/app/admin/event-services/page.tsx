@@ -12,6 +12,9 @@ import { getEventServices, deleteEventService, toggleEventServiceStatus } from '
 import Link from 'next/link'
 import { ProductFeatureDescription as FeatureDescriptionConfig } from '@/components/forms/product-feature-description';
 import { SiteFeature } from '@/lib/types';
+import { ZcalSettings } from '@/components/zcal-settings';
+import { ZcalBookingButton } from '@/components/zcal-booking-button';
+import { ZcalDebug } from '@/components/zcal-debug';
 
 export default function EventServicesPage() {
   const { currentSite } = useTenant()
@@ -116,6 +119,7 @@ export default function EventServicesPage() {
           </Button>
         </Link>
       </div>
+      
       {/* Feature Description Config */}
       <Card>
         <CardHeader>
@@ -125,6 +129,12 @@ export default function EventServicesPage() {
           <FeatureDescriptionConfig siteId={currentSite.id} featureName={SiteFeature.EVENT_SERVICES} />
         </CardContent>
       </Card>
+
+      {/* Zcal Settings */}
+      <ZcalSettings siteId={currentSite.id} />
+      
+      {/* Zcal Debug - Temporary */}
+      <ZcalDebug siteId={currentSite.id} />
 
       {/* Search and Filter */}
       <Card>
@@ -304,6 +314,8 @@ export default function EventServicesPage() {
                       </Button>
                     </Link>
                     
+                                         <ZcalBookingButton siteId={currentSite.id} serviceName={service.name} />
+
                     <Button
                       variant="outline"
                       size="sm"

@@ -22,6 +22,7 @@
     "@prisma/client": "^6.11.1",
     "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-select": "^2.2.5",
+    "@radix-ui/react-switch": "^1.2.5",
     "clsx": "^2.1.1",
     "lucide-react": "^0.525.0",
     "next": "15.3.5",

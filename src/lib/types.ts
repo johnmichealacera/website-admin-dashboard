@@ -243,6 +243,8 @@ export interface SiteFeatureData {
   siteId: string;
   name: FeatureName;
   description: string;
+  zcalLink?: string;
+  zcalEnabled?: boolean;
 }
 
 export interface ClientSiteSettingsData {
