@@ -304,6 +304,46 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="tiktok">TikTok</Label>
+                    <Input
+                      id="tiktok"
+                      value={formData.socialLinks?.tiktok || ''}
+                      onChange={(e) => handleSocialLinkChange('tiktok', e.target.value)}
+                      placeholder="https://tiktok.com/@youraccount"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="youtube">YouTube</Label>
+                    <Input
+                      id="youtube"
+                      value={formData.socialLinks?.youtube || ''}
+                      onChange={(e) => handleSocialLinkChange('youtube', e.target.value)}
+                      placeholder="https://youtube.com/@yourchannel"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="linkedin">LinkedIn</Label>
+                    <Input
+                      id="linkedin"
+                      value={formData.socialLinks?.linkedin || ''}
+                      onChange={(e) => handleSocialLinkChange('linkedin', e.target.value)}
+                      placeholder="https://linkedin.com/company/yourcompany"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="spotify">Spotify</Label>
+                    <Input
+                      id="spotify"
+                      value={formData.socialLinks?.spotify || ''}
+                      onChange={(e) => handleSocialLinkChange('spotify', e.target.value)}
+                      placeholder="https://open.spotify.com/artist/yourartist"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="website">Website</Label>
                     <Input
                       id="website"
