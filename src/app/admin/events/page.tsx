@@ -96,7 +96,7 @@ export default function EventsPage() {
             No Site Selected
           </h3>
           <p className="text-gray-600">
-            Please select a site to manage events.
+            Please select a site to manage bookings.
           </p>
         </div>
       </div>
@@ -108,9 +108,9 @@ export default function EventsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Events</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Bookings</h1>
             <p className="text-sm text-gray-500">
-              {editingEvent ? 'Edit event' : 'Add new event'}
+              {editingEvent ? 'Edit booking' : 'Add new booking'}
             </p>
           </div>
         </div>
@@ -129,20 +129,20 @@ export default function EventsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Events</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Bookings</h1>
           <p className="text-sm text-gray-500">
-            Manage your events for {currentSite.name}
+            Manage your bookings for {currentSite.name}
           </p>
         </div>
         <Button onClick={handleAddEvent}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Event
+          Add Booking
         </Button>
       </div>
       {/* Feature Description Config */}
       <Card>
         <CardHeader>
-          <CardTitle>Events Feature Configuration</CardTitle>
+          <CardTitle>Bookings Feature Configuration</CardTitle>
         </CardHeader>
         <CardContent>
           <FeatureDescriptionConfig siteId={currentSite.id} featureName={SiteFeature.EVENTS} />
@@ -153,27 +153,27 @@ export default function EventsPage() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
-            Event Calendar ({events.length})
+            Booking Calendar ({events.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading events...</p>
+              <p className="mt-2 text-gray-600">Loading bookings...</p>
             </div>
           ) : events.length === 0 ? (
             <div className="text-center py-12">
               <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                No events yet
+                No bookings yet
               </h3>
               <p className="text-gray-600 mb-4">
-                Get started by creating your first event to engage with your customers.
+                Get started by creating your first booking to engage with your customers.
               </p>
               <Button onClick={handleAddEvent}>
                 <Plus className="h-4 w-4 mr-2" />
-                Create Your First Event
+                Create Your First Booking
               </Button>
             </div>
           ) : (

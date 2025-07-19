@@ -17,7 +17,7 @@ import { ColorPicker } from '@/components/ui/color-picker'
 const AVAILABLE_FEATURES = [
   { feature: SiteFeature.PRODUCTS, label: 'Products', description: 'Manage product inventory and catalog' },
   { feature: SiteFeature.CATEGORIES, label: 'Categories', description: 'Organize products into categories' },
-  { feature: SiteFeature.EVENTS, label: 'Events', description: 'Create and manage events' },
+  { feature: SiteFeature.EVENTS, label: 'Bookings', description: 'Create and manage bookings' },
   { feature: SiteFeature.EVENT_SERVICES, label: 'Event Services', description: 'Manage service packages and pricing' },
   { feature: SiteFeature.ABOUT, label: 'About Us', description: 'Manage company information' },
   { feature: SiteFeature.CONTACT, label: 'Contact Info', description: 'Manage contact details and social links' },

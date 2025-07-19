@@ -90,7 +90,7 @@ export default function AdminDashboard() {
           )
           return {
             feature,
-            title: 'Events',
+            title: 'Bookings',
             value: events.filter(e => e.isActive).length,
             description: `${upcomingEvents.length} upcoming events`,
             icon: Calendar,

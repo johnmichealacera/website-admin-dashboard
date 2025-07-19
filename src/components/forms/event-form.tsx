@@ -178,7 +178,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
       <CardHeader>
         <CardTitle className="flex items-center">
           <Calendar className="h-5 w-5 mr-2" />
-          {eventId ? 'Edit Event' : 'Add New Event'}
+          {eventId ? 'Edit Booking' : 'Add New Booking'}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -188,12 +188,12 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
             <h3 className="text-lg font-semibold">Basic Information</h3>
             
             <div className="space-y-2">
-              <Label htmlFor="title">Event Title *</Label>
+              <Label htmlFor="title">Booking Title *</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Enter event title"
+                placeholder="Enter booking title"
                 required
               />
             </div>
@@ -204,7 +204,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                 id="description"
                 value={formData.description || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Enter event description"
+                placeholder="Enter booking description"
                 rows={4}
               />
             </div>
@@ -349,7 +349,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
           <div className="space-y-4">
             <h3 className="text-lg font-semibold flex items-center">
               <Upload className="h-5 w-5 mr-2" />
-              Event Images (Max 3)
+              Booking Images (Max 3)
             </h3>
             
             {/* Image Upload */}
@@ -365,7 +365,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Upload className="w-8 h-8 mb-3 text-gray-400" />
                       <p className="mb-2 text-sm text-gray-500">
-                        <span className="font-semibold">Click to upload</span> event images
+                        <span className="font-semibold">Click to upload</span> booking images
                       </p>
                       <p className="text-xs text-gray-500">
                         PNG, JPG, GIF up to 10MB (Max 3 images) • {3 - formData.imageUrls.length} remaining
@@ -463,7 +463,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
             )}
             <Button type="submit" disabled={isSubmitting || isUploading}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {eventId ? 'Update Event' : 'Add Event'}
+              {eventId ? 'Update Booking' : 'Add Booking'}
             </Button>
           </div>
         </form>
