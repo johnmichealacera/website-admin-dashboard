@@ -211,4 +211,90 @@ export async function getUpcomingEvents(siteId: string): Promise<Event[]> {
     console.error('Error fetching upcoming events:', error)
     return []
   }
+}
+
+export async function toggleEventFeatured(id: string, siteId: string): Promise<ApiResponse<Event>> {
+  try {
+    // First get the current event to check its featured status
+    const currentEvent = await db.event.findFirst({
+      where: {
+        id: id,
+        siteId: siteId,
+      },
+    })
+
+    if (!currentEvent) {
+      return {
+        success: false,
+        error: 'Event not found or you do not have permission to update it',
+      }
+    }
+
+    // Toggle the featured status
+    const updatedEvent = await db.event.update({
+      where: {
+        id: id,
+      },
+      data: {
+        isFeatured: !currentEvent.isFeatured,
+      },
+    })
+
+    revalidatePath('/admin/events')
+    revalidatePath('/admin')
+
+    return {
+      success: true,
+      data: updatedEvent,
+    }
+  } catch (error) {
+    console.error('Error toggling event featured status:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to toggle featured status',
+    }
+  }
+}
+
+export async function toggleEventConfirmed(id: string, siteId: string): Promise<ApiResponse<Event>> {
+  try {
+    // First get the current event to check its confirmed status
+    const currentEvent = await db.event.findFirst({
+      where: {
+        id: id,
+        siteId: siteId,
+      },
+    })
+
+    if (!currentEvent) {
+      return {
+        success: false,
+        error: 'Event not found or you do not have permission to update it',
+      }
+    }
+
+    // Toggle the confirmed status
+    const updatedEvent = await db.event.update({
+      where: {
+        id: id,
+      },
+      data: {
+        isConfirmed: !currentEvent.isConfirmed,
+      },
+    })
+
+    revalidatePath('/admin/events')
+    revalidatePath('/admin')
+
+    return {
+      success: true,
+      data: updatedEvent,
+    }
+  } catch (error) {
+    console.error('Error toggling event confirmed status:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to toggle confirmed status',
+    }
+  }
 } 
