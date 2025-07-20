@@ -174,7 +174,7 @@ export interface Event {
   tags: string[]
   contactEmail: string | null
   contactPhone: string | null
-  websiteUrl: string | null
+  contactName: string | null
   siteId: string
   createdAt: Date
   updatedAt: Date

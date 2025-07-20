@@ -59,7 +59,7 @@ export async function createEvent(data: EventFormData, siteId: string): Promise<
         tags: data.tags,
         contactEmail: data.contactEmail,
         contactPhone: data.contactPhone,
-        websiteUrl: data.websiteUrl,
+        contactName: data.contactName,
         siteId: siteId,
       },
     })
@@ -107,7 +107,7 @@ export async function updateEvent(id: string, data: Partial<EventFormData>, site
         ...(data.tags !== undefined && { tags: data.tags }),
         ...(data.contactEmail !== undefined && { contactEmail: data.contactEmail }),
         ...(data.contactPhone !== undefined && { contactPhone: data.contactPhone }),
-        ...(data.websiteUrl !== undefined && { websiteUrl: data.websiteUrl }),
+        ...(data.contactName !== undefined && { contactName: data.contactName }),
       },
     })
 

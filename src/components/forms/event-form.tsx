@@ -46,7 +46,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
     tags: initialData?.tags || [],
     contactEmail: initialData?.contactEmail || '',
     contactPhone: initialData?.contactPhone || '',
-    websiteUrl: initialData?.websiteUrl || '',
+    contactName: initialData?.contactName || '',
   })
 
   const [tagInput, setTagInput] = useState('')
@@ -318,6 +318,45 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                 onChange={(e) => setFormData(prev => ({ ...prev, maxAttendees: e.target.value ? parseInt(e.target.value) : null }))}
                 placeholder="Enter maximum number of attendees"
               />
+            </div>
+          </div>
+
+          {/* Contact Person */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Contact Person</h3>
+            
+            <div className="space-y-2">
+              <Label htmlFor="contactName">Contact Name</Label>
+              <Input
+                id="contactName"
+                value={formData.contactName || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, contactName: e.target.value }))}
+                placeholder="Enter contact person name"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="contactEmail">Contact Email</Label>
+                <Input
+                  id="contactEmail"
+                  type="email"
+                  value={formData.contactEmail || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
+                  placeholder="Enter contact email"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contactPhone">Contact Phone</Label>
+                <Input
+                  id="contactPhone"
+                  type="tel"
+                  value={formData.contactPhone || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
+                  placeholder="Enter contact phone number"
+                />
+              </div>
             </div>
           </div>
 
