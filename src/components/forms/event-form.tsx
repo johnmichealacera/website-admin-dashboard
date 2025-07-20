@@ -42,6 +42,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
     imageUrls: initialData?.imageUrls || [],
     isActive: initialData?.isActive ?? true,
     isFeatured: initialData?.isFeatured ?? false,
+    isConfirmed: initialData?.isConfirmed ?? false,
     tags: initialData?.tags || [],
     contactEmail: initialData?.contactEmail || '',
     contactPhone: initialData?.contactPhone || '',
@@ -306,6 +307,18 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                 placeholder="Enter country"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="maxAttendees">Maximum Attendees</Label>
+              <Input
+                id="maxAttendees"
+                type="number"
+                min="1"
+                value={formData.maxAttendees || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, maxAttendees: e.target.value ? parseInt(e.target.value) : null }))}
+                placeholder="Enter maximum number of attendees"
+              />
+            </div>
           </div>
 
           {/* Tags */}
@@ -451,6 +464,15 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFeatured: checked as boolean }))}
                 />
                 <Label htmlFor="isFeatured">Featured event</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="isConfirmed"
+                  checked={formData.isConfirmed}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isConfirmed: checked as boolean }))}
+                />
+                <Label htmlFor="isConfirmed">Booking is confirmed</Label>
               </div>
                         </div>
           </div>

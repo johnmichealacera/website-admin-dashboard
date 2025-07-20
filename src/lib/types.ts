@@ -170,6 +170,7 @@ export interface Event {
   imageUrls: string[]
   isActive: boolean
   isFeatured: boolean
+  isConfirmed: boolean
   tags: string[]
   contactEmail: string | null
   contactPhone: string | null

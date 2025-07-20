@@ -159,6 +159,7 @@ model Event {
   imageUrls    String[]  @default([])
   isActive     Boolean   @default(true)
   isFeatured   Boolean   @default(false)
+  isConfirmed  Boolean   @default(false)
   tags         String[]  @default([])
   contactEmail String?
   contactPhone String?
