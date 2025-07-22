@@ -14,6 +14,7 @@ export interface SitePackageInfo {
   features?: SiteFeatureData[]
   featuresOrder?: SiteFeature[]
   colorPalette?: string[]
+  googleAnalyticsTag?: string | null
   isActive?: boolean
   updatedAt: Date
   _count?: {
@@ -71,6 +72,7 @@ export interface Site {
   subdomain: string | null
   description: string | null
   logoUrl: string | null
+  googleAnalyticsTag: string | null
   isActive: boolean
   packageType: SitePackage
   features: SiteFeatureData[]
@@ -251,6 +253,7 @@ export interface SiteFeatureData {
 export interface ClientSiteSettingsData {
   name: string;
   description: string | null;
+  googleAnalyticsTag: string | null;
   features: SiteFeatureData[];
   featuresOrder: FeatureName[];
   colorPalette: string[];
@@ -260,6 +263,7 @@ export interface ClientSiteUpdateData {
   siteId: string;
   name: string;
   description: string | null;
+  googleAnalyticsTag: string | null;
   features: SiteFeatureData[];
   featuresOrder: FeatureName[];
   colorPalette: string[];

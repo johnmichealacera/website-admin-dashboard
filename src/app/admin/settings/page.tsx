@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Settings, Package, Shield, Building2, AlertCircle, Save, Loader2, Upload, X } from 'lucide-react'
 import { useTenant } from '@/contexts/tenant-context'
 import { SitePackage, SiteFeature, SitePackageFormData, SitePackageInfo, SiteFeatureData } from '@/lib/types'
-import { updateSitePackage, getSitePackageInfo, getAllSitesPackageInfo, updateSiteLogo } from '@/lib/actions/site-settings'
+import { updateSitePackage, getSitePackageInfo, getAllSitesPackageInfo, updateSiteLogo, updateGoogleAnalyticsTag } from '@/lib/actions/site-settings'
 import { PACKAGE_FEATURES } from '@/lib/utils/site-features'
 import { handleFileChange } from "@jmacera/cloudinary-image-upload";
 import Image from 'next/image'
@@ -173,13 +174,20 @@ export default function SiteSettingsPage() {
     setIsSubmitting(true)
     setError(null)
 
-    const result = await updateSitePackage({
-      siteId: selectedSite.id,
+    // Update site package
+    const packageResult = await updateSitePackage({
+      siteId: selectedSite.id,  
       packageType: formData.packageType,
       features: formData.features
     })
 
-    if (result.success) {
+    // Update Google Analytics tag
+    const analyticsResult = await updateGoogleAnalyticsTag(
+      selectedSite.id,
+      selectedSite.googleAnalyticsTag || null
+    )
+
+    if (packageResult.success && analyticsResult.success) {
       // Update local state
       setSelectedSite(prev => prev ? {
         ...prev,
@@ -191,7 +199,7 @@ export default function SiteSettingsPage() {
       // Refresh all sites list
       loadAllSites()
     } else {
-      setError(result.error || 'Failed to update site package')
+      setError(packageResult.error || analyticsResult.error || 'Failed to update site settings')
     }
 
     setIsSubmitting(false)
@@ -344,6 +352,23 @@ export default function SiteSettingsPage() {
                         <SelectItem value={SitePackage.ENTERPRISE}>Enterprise</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="googleAnalytics">Google Analytics Tag</Label>
+                    <Input
+                      id="googleAnalytics"
+                      value={selectedSite.googleAnalyticsTag || ''}
+                      onChange={(e) => {
+                        const updatedSite = { ...selectedSite, googleAnalyticsTag: e.target.value || null }
+                        setSelectedSite(updatedSite)
+                      }}
+                      placeholder="G-XXXXXXXXXX or GA_MEASUREMENT_ID"
+                      className="mt-1"
+                    />
+                    <p className="text-sm text-gray-500 mt-1">
+                      Enter the Google Analytics measurement ID for this site to enable analytics tracking.
+                    </p>
                   </div>
 
                   <div>

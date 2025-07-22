@@ -41,6 +41,7 @@ export async function getSitePackageInfo(siteId: string) {
         name: true,
         logoUrl: true,
         packageType: true,
+        googleAnalyticsTag: true,
         features: { select: { name: true, description: true } },
         updatedAt: true
       }
@@ -172,6 +173,7 @@ export async function updateClientSiteSettings(data: ClientSiteUpdateData) {
       data: {
         name: data.name.trim(),
         description: data.description?.trim() || null,
+        googleAnalyticsTag: data.googleAnalyticsTag?.trim() || null,
         featuresOrder: featuresOrder,
         colorPalette: data.colorPalette,
         updatedAt: new Date()
@@ -180,6 +182,7 @@ export async function updateClientSiteSettings(data: ClientSiteUpdateData) {
         id: true,
         name: true,
         description: true,
+        googleAnalyticsTag: true,
         featuresOrder: true,
         colorPalette: true,
         packageType: true,
@@ -203,6 +206,7 @@ export async function getClientSiteSettings(siteId: string) {
         id: true,
         name: true,
         description: true,
+        googleAnalyticsTag: true,
         features: { select: { siteId: true, name: true, description: true } },
         featuresOrder: true,
         colorPalette: true,
@@ -218,6 +222,7 @@ export async function getClientSiteSettings(siteId: string) {
       id: site.id,
       name: site.name,
       description: site.description,
+      googleAnalyticsTag: site.googleAnalyticsTag,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       features: site.features.map((f: any) => ({ siteId: site.id, name: f.name, description: f.description })),
       featuresOrder: site.featuresOrder,
@@ -229,5 +234,29 @@ export async function getClientSiteSettings(siteId: string) {
   } catch (error) {
     console.error('Error fetching client site settings:', error);
     return { success: false, error: 'Failed to fetch site settings' };
+  }
+}
+
+export async function updateGoogleAnalyticsTag(siteId: string, googleAnalyticsTag: string | null) {
+  try {
+    const updatedSite = await db.site.update({
+      where: { id: siteId },
+      data: {
+        googleAnalyticsTag: googleAnalyticsTag,
+        updatedAt: new Date()
+      },
+      select: {
+        id: true,
+        name: true,
+        googleAnalyticsTag: true,
+        updatedAt: true
+      }
+    });
+    revalidatePath('/admin/site-settings')
+    revalidatePath('/admin')
+    return { success: true, site: updatedSite }
+  } catch (error) {
+    console.error('Error updating Google Analytics tag:', error)
+    return { success: false, error: 'Failed to update Google Analytics tag' }
   }
 }

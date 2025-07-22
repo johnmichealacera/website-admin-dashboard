@@ -39,6 +39,7 @@ export default function ClientSiteSettingsPage() {
   const [formData, setFormData] = useState<ClientSiteSettingsData>({
     name: '',
     description: '',
+    googleAnalyticsTag: '',
     features: [{ siteId: currentSite?.id || '', name: SiteFeature.DASHBOARD, description: '' }],
     featuresOrder: [SiteFeature.DASHBOARD],
     colorPalette: ['#3B82F6', '#10B981', '#F59E0B']
@@ -65,6 +66,7 @@ export default function ClientSiteSettingsPage() {
       const settings: ClientSiteSettingsData = {
         name: result.site.name,
         description: result.site.description,
+        googleAnalyticsTag: result.site.googleAnalyticsTag,
         features: result.site.features || [{ siteId: currentSite?.id || '', name: SiteFeature.DASHBOARD, description: '' }],
         featuresOrder: result.site.featuresOrder as FeatureName[],
         colorPalette: result.site.colorPalette || ['#3B82F6', '#10B981', '#F59E0B']
@@ -137,6 +139,7 @@ export default function ClientSiteSettingsPage() {
       siteId: currentSite.id,
       name: formData.name,
       description: formData.description,
+      googleAnalyticsTag: formData.googleAnalyticsTag,
       features: formData.features,
       featuresOrder: formData.featuresOrder,
       colorPalette: formData.colorPalette
@@ -165,6 +168,7 @@ export default function ClientSiteSettingsPage() {
   const hasChanges = siteSettings && (
     formData.name !== siteSettings.name ||
     formData.description !== siteSettings.description ||
+    formData.googleAnalyticsTag !== siteSettings.googleAnalyticsTag ||
     JSON.stringify(formData.features.map(f => f.name).sort()) !== JSON.stringify(siteSettings.features.map(f => f.name).sort()) ||
     JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder) ||
     JSON.stringify(formData.colorPalette) !== JSON.stringify(siteSettings.colorPalette)
@@ -291,6 +295,20 @@ export default function ClientSiteSettingsPage() {
                 A brief description that will be stored in your site settings.
               </p>
             </div>
+
+            {/* <div>
+              <Label htmlFor="googleAnalytics">Google Analytics Tag</Label>
+              <Input
+                id="googleAnalytics"
+                value={formData.googleAnalyticsTag || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, googleAnalyticsTag: e.target.value || null }))}
+                placeholder="G-XXXXXXXXXX or GA_MEASUREMENT_ID"
+                className="mt-1"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Enter your Google Analytics measurement ID (e.g., G-XXXXXXXXXX) to track website analytics.
+              </p>
+            </div> */}
 
             {/* Color Palette Section */}
             <div>
