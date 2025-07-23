@@ -189,7 +189,7 @@ export interface EventService {
   basePrice: number | null
   isActive: boolean
   isFeatured: boolean
-  category: string | null
+  packages: string[]
   duration: string | null
   inclusions: string[]
   addOns: EventServiceAddOn[] | null
@@ -199,6 +199,21 @@ export interface EventService {
   bookingUrl: string | null
   tags: string[]
   siteId: string
+  createdAt: Date
+  updatedAt: Date
+  servicePackages?: EventServicePackage[]
+}
+
+export interface EventServicePackage {
+  id: string
+  name: string
+  description: string | null
+  price: number | null
+  inclusions: string[]
+  addOns: EventServiceAddOn[] | null
+  freebies: string[]
+  isActive: boolean
+  eventServiceId: string
   createdAt: Date
   updatedAt: Date
 }
@@ -237,7 +252,9 @@ export type ContactFormData = Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>
 
 export type EventFormData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
 
-export type EventServiceFormData = Omit<EventService, 'id' | 'createdAt' | 'updatedAt' | 'imageUrls'>
+export type EventServiceFormData = Omit<EventService, 'id' | 'createdAt' | 'updatedAt' | 'imageUrls' | 'servicePackages'> & {
+  servicePackages?: Omit<EventServicePackage, 'id' | 'createdAt' | 'updatedAt' | 'eventServiceId'>[]
+}
 
 export type SiteFormData = Omit<Site, 'id' | 'createdAt' | 'updatedAt'>
 

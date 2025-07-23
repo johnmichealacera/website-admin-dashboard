@@ -38,6 +38,13 @@ export async function getEventService(id: string, siteId: string): Promise<ApiRe
         id,
         siteId: siteId,
       },
+      include: {
+        servicePackages: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+      },
     })
 
     if (!eventService) {
@@ -51,7 +58,12 @@ export async function getEventService(id: string, siteId: string): Promise<ApiRe
       success: true,
       data: {
         ...eventService,
-        addOns: eventService.addOns ? JSON.parse(JSON.stringify(eventService.addOns)) : null
+        addOns: eventService.addOns ? JSON.parse(JSON.stringify(eventService.addOns)) : null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        servicePackages: eventService.servicePackages?.map((pkg: any) => ({
+          ...pkg,
+          addOns: pkg.addOns ? JSON.parse(JSON.stringify(pkg.addOns)) : null
+        })) || []
       },
     }
   } catch (error) {
@@ -66,12 +78,33 @@ export async function getEventService(id: string, siteId: string): Promise<ApiRe
 export async function createEventService(data: EventServiceFormData): Promise<ApiResponse<EventService>> {
   try {
     console.log('createEventService data', data)
+    
+    // Extract packages data from the form data
+    const { servicePackages, ...eventServiceData } = data
+    
+    // First create the event service
     const eventService = await db.eventService.create({
       data: {
-        ...data,
-        addOns: data.addOns ? JSON.parse(JSON.stringify(data.addOns)) : null,
+        ...eventServiceData,
+        addOns: eventServiceData.addOns ? JSON.parse(JSON.stringify(eventServiceData.addOns)) : null,
       },
     })
+
+    // Then create packages if provided
+    if (servicePackages && servicePackages.length > 0) {
+      await db.eventServicePackage.createMany({
+        data: servicePackages.map(pkg => ({
+          name: pkg.name,
+          description: pkg.description,
+          price: pkg.price,
+          inclusions: pkg.inclusions,
+          addOns: pkg.addOns ? JSON.parse(JSON.stringify(pkg.addOns)) : null,
+          freebies: pkg.freebies,
+          isActive: pkg.isActive,
+          eventServiceId: eventService.id
+        }))
+      })
+    }
 
     revalidatePath('/admin/event-services')
 
@@ -93,14 +126,17 @@ export async function createEventService(data: EventServiceFormData): Promise<Ap
 
 export async function updateEventService(id: string, data: EventServiceFormData, siteId: string): Promise<ApiResponse<EventService>> {
   try {
+    // Extract packages data from the form data
+    const { servicePackages, ...eventServiceData } = data
+    
     const eventService = await db.eventService.updateMany({
       where: {
         id,
         siteId: siteId,
       },
       data: {
-        ...data,
-        addOns: data.addOns ? JSON.parse(JSON.stringify(data.addOns)) : null,
+        ...eventServiceData,
+        addOns: eventServiceData.addOns ? JSON.parse(JSON.stringify(eventServiceData.addOns)) : null,
       },
     })
 
@@ -111,12 +147,41 @@ export async function updateEventService(id: string, data: EventServiceFormData,
       }
     }
 
-    // Fetch the updated event service
+    // Update packages if provided
+    if (servicePackages) {
+      // Delete existing packages
+      await db.eventServicePackage.deleteMany({
+        where: {
+          eventServiceId: id,
+        },
+      })
+
+      // Create new packages
+      if (servicePackages.length > 0) {
+        await db.eventServicePackage.createMany({
+          data: servicePackages.map(pkg => ({
+            name: pkg.name,
+            description: pkg.description,
+            price: pkg.price,
+            inclusions: pkg.inclusions,
+            addOns: pkg.addOns ? JSON.parse(JSON.stringify(pkg.addOns)) : null,
+            freebies: pkg.freebies,
+            isActive: pkg.isActive,
+            eventServiceId: id
+          }))
+        })
+      }
+    }
+
+    // Fetch the updated event service with packages
     const updatedEventService = await db.eventService.findFirst({
       where: {
         id,
         siteId: siteId,
       },
+      include: {
+        servicePackages: true
+      }
     })
 
     revalidatePath('/admin/event-services')
@@ -125,7 +190,11 @@ export async function updateEventService(id: string, data: EventServiceFormData,
       success: true,
       data: {
         ...updatedEventService!,
-        addOns: updatedEventService!.addOns ? JSON.parse(JSON.stringify(updatedEventService!.addOns)) : null
+        addOns: updatedEventService!.addOns ? JSON.parse(JSON.stringify(updatedEventService!.addOns)) : null,
+        servicePackages: updatedEventService!.servicePackages?.map((pkg) => ({
+          ...pkg,
+          addOns: pkg.addOns ? JSON.parse(JSON.stringify(pkg.addOns)) : null
+        })) || []
       },
     }
   } catch (error) {

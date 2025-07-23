@@ -101,7 +101,7 @@ async function main() {
         name: 'Full Wedding Coordination',
         description: 'From concept to execution, complete wedding planning and coordination.',
         basePrice: 45000,
-        category: 'Wedding',
+        packages: ['Silver', 'Gold', 'Platinum'],
         duration: 'Full Day',
         inclusions: [
           'Venue Setup',
@@ -128,7 +128,7 @@ async function main() {
         name: 'Birthday Styling Package',
         description: 'Themed decorations and styling for birthday parties.',
         basePrice: 15000,
-        category: 'Birthday',
+        packages: ['Silver', 'Gold', 'Platinum'],
         duration: 'Half Day',
         inclusions: [
           'Themed Backdrop & Stage',
@@ -154,7 +154,7 @@ async function main() {
         name: 'Corporate Event Setup',
         description: 'Professional setup and styling for business launches, conferences, and seminars.',
         basePrice: 25000,
-        category: 'Corporate',
+        packages: ['Deluxe', 'All-in Signature'],
         duration: 'One Day',
         inclusions: [
           'Stage & Backdrop Design',
