@@ -12,7 +12,8 @@ import { useTenant } from '@/contexts/tenant-context'
 import { SitePackage, SiteFeature, SitePackageFormData, SitePackageInfo, SiteFeatureData } from '@/lib/types'
 import { updateSitePackage, getSitePackageInfo, getAllSitesPackageInfo, updateSiteLogo, updateGoogleAnalyticsTag } from '@/lib/actions/site-settings'
 import { PACKAGE_FEATURES } from '@/lib/utils/site-features'
-import { handleFileChange } from "@jmacera/cloudinary-image-upload";
+import { uploadToCloudinary } from "@/lib/utils/cloudinary-upload";
+import { OptimizationStatus } from "@/components/ui/optimization-status";
 import Image from 'next/image'
 
 export default function SiteSettingsPage() {
@@ -120,17 +121,23 @@ export default function SiteSettingsPage() {
     setError(null)
 
     try {
-      const uploadedUrl = await handleFileChange(cloudinaryUrl, uploadPreset, apiKey, file)
+      const result = await uploadToCloudinary(file, {
+        cloudinaryUrl,
+        uploadPreset,
+        apiKey,
+        enableWebPOptimization: true,
+        showOptimizationInfo: true
+      })
       
-      if (uploadedUrl && uploadedUrl.trim() !== '') {
-        const result = await updateSiteLogo(selectedSite.id, uploadedUrl)
+      if (result.url && result.url.trim() !== '') {
+        const updateResult = await updateSiteLogo(selectedSite.id, result.url)
         
-        if (result.success) {
-          setSelectedSite(prev => prev ? { ...prev, logoUrl: uploadedUrl } : null)
+        if (updateResult.success) {
+          setSelectedSite(prev => prev ? { ...prev, logoUrl: result.url } : null)
           // Refresh the sites list to reflect changes
           loadAllSites()
         } else {
-          setError(result.error || 'Failed to update site logo')
+          setError(updateResult.error || 'Failed to update site logo')
         }
       }
     } catch (err) {
@@ -414,11 +421,14 @@ export default function SiteSettingsPage() {
 
                 {/* Site Logo Upload */}
                 <div className="space-y-4">
-                  <div>
-                    <Label>Site Logo</Label>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Upload a logo for this site. Recommended size: 200x200px or larger.
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Site Logo</Label>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Upload a logo for this site. Recommended size: 200x200px or larger.
+                      </p>
+                    </div>
+                    <OptimizationStatus showDetails={true} />
                   </div>
 
                   {selectedSite.logoUrl ? (

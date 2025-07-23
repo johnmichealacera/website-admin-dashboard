@@ -10,7 +10,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { EventFormData } from '@/lib/types'
 import { createEvent, updateEvent } from '@/lib/actions/events'
 import { Loader2, Calendar, MapPin, Upload, X } from 'lucide-react'
-import { handleFileChange } from "@jmacera/cloudinary-image-upload";
+import { uploadMultipleToCloudinary } from "@/lib/utils/cloudinary-upload";
+import { OptimizationStatus } from "@/components/ui/optimization-status";
 import Image from 'next/image'
 import { useTenant } from '@/contexts/tenant-context'
 
@@ -112,12 +113,15 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
       // Only upload as many files as we have slots for
       const filesToUpload = Array.from(files).slice(0, remainingSlots)
       
-      const uploadPromises = filesToUpload.map(async (file) => {
-        return await handleFileChange(cloudinaryUrl, uploadPreset, apiKey, file)
+      const results = await uploadMultipleToCloudinary(filesToUpload, {
+        cloudinaryUrl,
+        uploadPreset,
+        apiKey,
+        enableWebPOptimization: true,
+        showOptimizationInfo: true
       })
 
-      const uploadedUrls = await Promise.all(uploadPromises)
-      const validUrls = uploadedUrls.filter((url: string | undefined) => url && url.trim() !== '')
+      const validUrls = results.map(result => result.url).filter(url => url && url.trim() !== '')
 
       if (validUrls.length > 0) {
         setFormData(prev => ({
@@ -399,10 +403,13 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
 
           {/* Event Images */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center">
-              <Upload className="h-5 w-5 mr-2" />
-              Booking Images (Max 3)
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold flex items-center">
+                <Upload className="h-5 w-5 mr-2" />
+                Booking Images (Max 3)
+              </h3>
+              <OptimizationStatus showDetails={true} />
+            </div>
             
             {/* Image Upload */}
             <div className="space-y-2">

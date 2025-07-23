@@ -11,7 +11,8 @@ import { ProductFormData, Category } from '@/lib/types'
 import { getCategoriesSimple } from '@/lib/actions/categories'
 import { createProduct, updateProduct } from '@/lib/actions/products'
 import { Loader2, Upload, X } from 'lucide-react'
-import { handleFileChange } from "@jmacera/cloudinary-image-upload";
+import { uploadToCloudinary } from "@/lib/utils/cloudinary-upload";
+import { OptimizationStatus } from "@/components/ui/optimization-status";
 import Image from 'next/image'
 import { useTenant } from '@/contexts/tenant-context'
 
@@ -98,13 +99,19 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
     setIsUploading(true)
     
     try {
-      const uploadedUrl = await handleFileChange(cloudinaryUrl, uploadPreset, apiKey, file)
+      const result = await uploadToCloudinary(file, {
+        cloudinaryUrl,
+        uploadPreset,
+        apiKey,
+        enableWebPOptimization: true,
+        showOptimizationInfo: true
+      })
 
-      if (uploadedUrl && uploadedUrl.trim() !== '') {
+      if (result.url && result.url.trim() !== '') {
         // Replace the existing image with the new one
         setFormData(prev => ({
           ...prev,
-          imageUrls: [uploadedUrl]
+          imageUrls: [result.url]
         }))
       }
     } catch (err) {
@@ -212,7 +219,10 @@ export function ProductForm({ initialData, productId, onSuccess, onCancel }: Pro
           </div>
 
           <div className="space-y-4">
-            <Label>Product Image</Label>
+            <div className="flex items-center justify-between">
+              <Label>Product Image</Label>
+              <OptimizationStatus showDetails={true} />
+            </div>
             
             {/* Image Upload */}
             <div className="space-y-2">

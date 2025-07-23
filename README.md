@@ -20,7 +20,8 @@ A modern, full-stack multi-tenant admin dashboard for managing business inventor
 - **Event Services**: Comprehensive service package management with pricing, add-ons, and freebies
 - **Business Information**: Update About Us and Contact information
 - **Logo Management**: Upload, replace, and remove site logos with Cloudinary integration
-- **Image Upload**: Cloudinary integration for product, event, and logo images with optimized storage
+- **Image Upload**: Cloudinary integration for product, event, and logo images with WebP optimization for better performance
+- **WebP Optimization**: Automatic client-side image conversion to WebP format for 25-50% smaller file sizes
 
 ### Multi-Tenant Features
 - **Site Selector**: Users with access to multiple sites can switch between them

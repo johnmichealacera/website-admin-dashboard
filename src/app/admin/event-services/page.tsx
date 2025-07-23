@@ -13,7 +13,6 @@ import Link from 'next/link'
 import { ProductFeatureDescription as FeatureDescriptionConfig } from '@/components/forms/product-feature-description';
 import { SiteFeature } from '@/lib/types';
 import { ZcalSettings } from '@/components/zcal-settings';
-import { ZcalBookingButton } from '@/components/zcal-booking-button';
 import { ZcalDebug } from '@/components/zcal-debug';
 
 export default function EventServicesPage() {
@@ -355,7 +354,7 @@ export default function EventServicesPage() {
                       </Button>
                     </Link>
                     
-                                         <ZcalBookingButton siteId={currentSite.id} serviceName={service.name} />
+                    {/* <ZcalBookingButton siteId={currentSite.id} serviceName={service.name} /> */}
 
                     <Button
                       variant="outline"
