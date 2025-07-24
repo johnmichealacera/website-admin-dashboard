@@ -34,6 +34,7 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
     contactPhone: initialData?.contactPhone || '',
     bookingUrl: initialData?.bookingUrl || '',
     tags: initialData?.tags || [],
+    bgImage: initialData?.bgImage || '',
     siteId: currentSite?.id || '',
     servicePackages: initialData?.servicePackages?.map(pkg => ({
       name: pkg.name,
@@ -42,7 +43,9 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
       inclusions: pkg.inclusions,
       addOns: pkg.addOns || [],
       freebies: pkg.freebies,
-      isActive: pkg.isActive
+      isActive: pkg.isActive,
+      sortOrder: pkg.sortOrder || 0,
+      colorHexCode: pkg.colorHexCode || "#3B82F6"
     })) || []
   })
 
@@ -103,7 +106,9 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
         inclusions: [],
         addOns: [],
         freebies: [],
-        isActive: true
+        isActive: true,
+        sortOrder: 0,
+        colorHexCode: "#3B82F6"
       }
       
       console.log('Adding package:', newPkg)
@@ -289,6 +294,20 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
               placeholder="Describe your event service package..."
               rows={4}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bgImage">Background Image URL</Label>
+            <Input
+              id="bgImage"
+              type="url"
+              value={formData.bgImage || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, bgImage: e.target.value }))}
+              placeholder="https://example.com/background-image.jpg"
+            />
+            <p className="text-xs text-gray-500">
+              Optional: URL for a background image for this service
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

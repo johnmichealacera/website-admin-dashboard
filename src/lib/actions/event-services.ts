@@ -101,6 +101,8 @@ export async function createEventService(data: EventServiceFormData): Promise<Ap
           addOns: pkg.addOns ? JSON.parse(JSON.stringify(pkg.addOns)) : null,
           freebies: pkg.freebies,
           isActive: pkg.isActive,
+          sortOrder: pkg.sortOrder || 0,
+          colorHexCode: pkg.colorHexCode || "#3B82F6",
           eventServiceId: eventService.id
         }))
       })
@@ -167,6 +169,8 @@ export async function updateEventService(id: string, data: EventServiceFormData,
             addOns: pkg.addOns ? JSON.parse(JSON.stringify(pkg.addOns)) : null,
             freebies: pkg.freebies,
             isActive: pkg.isActive,
+            sortOrder: pkg.sortOrder || 0,
+            colorHexCode: pkg.colorHexCode || "#3B82F6",
             eventServiceId: id
           }))
         })

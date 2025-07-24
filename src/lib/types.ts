@@ -198,6 +198,7 @@ export interface EventService {
   contactPhone: string | null
   bookingUrl: string | null
   tags: string[]
+  bgImage: string | null
   siteId: string
   createdAt: Date
   updatedAt: Date
@@ -213,6 +214,8 @@ export interface EventServicePackage {
   addOns: EventServiceAddOn[] | null
   freebies: string[]
   isActive: boolean
+  sortOrder: number
+  colorHexCode: string | null
   eventServiceId: string
   createdAt: Date
   updatedAt: Date
