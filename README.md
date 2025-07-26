@@ -16,7 +16,7 @@ A modern, full-stack multi-tenant admin dashboard for managing business inventor
 ### Business Management Features
 - **Product Management**: Add, edit, delete, and manage product inventory with image uploads
 - **Category Management**: Organize products into categories with descriptions
-- **Event Management**: Create and manage business events with dates, locations, attendee limits, and image galleries
+- **Event Management**: Create and manage business events with dates, locations, attendee limits, image galleries, and optional service package linking
 - **Event Services**: Comprehensive service package management with pricing, add-ons, and freebies
 - **Business Information**: Update About Us and Contact information
 - **Logo Management**: Upload, replace, and remove site logos with Cloudinary integration
@@ -39,6 +39,11 @@ A modern, full-stack multi-tenant admin dashboard for managing business inventor
 - **Enterprise Package**: Dashboard, Products, Categories, Events, Event Services, About, Contact
 
 ### User Roles
+### Event Management Enhancements
+- **Service Package Linking**: Events can be optionally linked to specific service packages for better organization
+- **Comprehensive Package Display**: Rich display of package details including pricing, inclusions, add-ons, and freebies
+- **Enhanced Admin Dashboards**: Improved event services listing with complete package information
+- **Visual Improvements**: Color-coded sections, gradient backgrounds, and responsive design for better user experience
 - **Super Admin**: Full access to all sites and site settings management
 - **Admin**: Full access to assigned sites only
 - **Site-Specific Roles**: Users can have different roles per site
@@ -282,6 +287,13 @@ The application uses the following database models:
 - Site-specific category management
 
 #### Event Management
+#### Event Management with Service Package Linking
+- **Link Events to Packages**: When creating or editing events, optionally select a service package from the dropdown
+- **View Linked Information**: Events with linked packages display comprehensive package details including pricing and inclusions
+- **Enhanced Organization**: Better organize your bookings by linking them to specific service packages
+- **Rich Package Display**: View service packages with detailed information including pricing, inclusions, add-ons, and freebies
+- **Contact Information**: Each service displays contact details and booking URLs
+- **Visual Organization**: Color-coded sections make it easy to scan and understand service offerings
 - Create events with comprehensive details and image galleries (max 3 images)
 - Edit existing events with date, location, and pricing management
 - Delete events (with confirmation)
@@ -623,9 +635,25 @@ If you encounter any issues or have questions:
 
 Built with ❤️ for multi-tenant business management
 
+## 📋 Version History
+
+- **v2.2.0** - Event Service Package Relations & Enhanced Admin Dashboards
+- **v2.1.0** - Dynamic Dashboard & Package-Based Features
+- **v2.0.0** - Event Image Upload & Enhanced Forms
+- **v1.5.0** - Event Services Management
+- **v1.4.0** - Multi-Tenant Package System
+- **v1.3.0** - Full Multi-Tenant Architecture
+- **v1.2.0** - Auth0 Integration
+- **v1.1.0** - Product Image Upload
+- **v1.0.0** - Initial Release
+
 ## 🆕 Recent Updates
 
 ### Latest Changes
+- **Event Service Package Relations**: Optional linking between events and service packages for better organization
+- **Enhanced Event Services Dashboard**: Comprehensive package display with pricing, inclusions, and add-ons
+- **Improved Visual Design**: Color-coded sections and responsive design for better user experience
+- **Database Relations**: Proper event-service-package relationships with non-destructive migrations
 - **Image Upload for Events**: Added Cloudinary integration for event images with a maximum of 3 images per event
 - **Enhanced Event Form**: Improved event creation/editing form with image gallery support
 - **Multi-Tenant Architecture**: Complete implementation of multi-tenant system with site isolation
