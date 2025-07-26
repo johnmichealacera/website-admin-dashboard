@@ -74,8 +74,6 @@ export async function uploadToCloudinary(
           savingsPercentage: ((result.originalSize - result.optimizedSize) / result.originalSize) * 100,
           format: result.format
         };
-        
-        console.log(`Image optimization: ${formatFileSize(result.originalSize)} → ${formatFileSize(result.optimizedSize)} (${optimizationInfo.savingsPercentage.toFixed(1)}% smaller)`);
       }
     } catch (error) {
       console.warn('WebP optimization failed, falling back to original file:', error);

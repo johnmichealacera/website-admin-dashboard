@@ -68,9 +68,6 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
       return
     }
 
-    console.log('Submitting form data:', formData)
-    console.log('Service packages:', formData.servicePackages)
-
     await onSubmit({
       ...formData,
       siteId: currentSite.id
@@ -95,9 +92,6 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
   }
 
   const addPackage = () => {
-    console.log('addPackage called')
-    console.log('newPackage:', newPackage)
-    
     if (newPackage.trim()) {
       const newPkg = {
         name: newPackage.trim(),
@@ -111,27 +105,17 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
         colorHexCode: "#3B82F6"
       }
       
-      console.log('Adding package:', newPkg)
-      
       setFormData(prev => {
         const updated = {
           ...prev,
           packages: [...prev.packages, newPackage.trim()],
           servicePackages: [...(prev.servicePackages || []), newPkg]
         }
-        console.log('Updated form data:', updated)
         return updated
       })
       
       setNewPackage('')
       setNewPackageDescription('')
-      
-      // Show success message
-      alert('Package added successfully!')
-    } else {
-      console.log('Cannot add package - missing name')
-      console.log('newPackage:', newPackage)
-      alert('Please enter a package name')
     }
   }
 
@@ -144,9 +128,6 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
   }
 
   const addPackageInclusion = (packageIndex: number) => {
-    console.log('addPackageInclusion called for package:', packageIndex)
-    console.log('newPackageInclusion:', newPackageInclusion)
-    
     if (newPackageInclusion.trim()) {
       setFormData(prev => {
         const updated = {
@@ -157,13 +138,9 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
               : pkg
           )
         }
-        console.log('Updated form data after adding inclusion:', updated)
         return updated
       })
       setNewPackageInclusion('')
-      alert('Inclusion added successfully!')
-    } else {
-      alert('Please enter an inclusion')
     }
   }
 
@@ -179,9 +156,6 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
   }
 
   const addPackageFreebie = (packageIndex: number) => {
-    console.log('addPackageFreebie called for package:', packageIndex)
-    console.log('newPackageFreebie:', newPackageFreebie)
-    
     if (newPackageFreebie.trim()) {
       setFormData(prev => {
         const updated = {
@@ -192,13 +166,9 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
               : pkg
           )
         }
-        console.log('Updated form data after adding freebie:', updated)
         return updated
       })
       setNewPackageFreebie('')
-      alert('Freebie added successfully!')
-    } else {
-      alert('Please enter a freebie')
     }
   }
 
@@ -214,9 +184,6 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
   }
 
   const addPackageAddOn = (packageIndex: number) => {
-    console.log('addPackageAddOn called for package:', packageIndex)
-    console.log('newPackageAddOn:', newPackageAddOn)
-    
     if (newPackageAddOn.name?.trim()) {
       const addOn = {
         name: newPackageAddOn.name.trim(),
@@ -233,14 +200,10 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
               : pkg
           )
         }
-        console.log('Updated form data after adding add-on:', updated)
         return updated
       })
       
       setNewPackageAddOn({ name: '', price: 0, description: '' })
-      alert('Add-on added successfully!')
-    } else {
-      alert('Please enter add-on name')
     }
   }
 
@@ -311,7 +274,8 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+            {/* TODO: Decide if we want to show the base price */}
+            {/* <div className="space-y-2">
               <Label htmlFor="basePrice">Base Price (₱)</Label>
               <Input
                 id="basePrice"
@@ -322,7 +286,7 @@ export function EventServiceForm({ initialData, onSubmit, isSubmitting = false }
                 onChange={(e) => setFormData(prev => ({ ...prev, basePrice: parseFloat(e.target.value) || 0 }))}
                 placeholder="0.00"
               />
-            </div>
+            </div> */}
             <div className="space-y-2">
               <Label htmlFor="duration">Duration</Label>
               <Input

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { EventForm } from '@/components/forms/event-form'
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog'
-import { Plus, Calendar, Edit, Trash2, MapPin, Clock, Star, CheckCircle, Users, Phone, Mail, User } from 'lucide-react'
+import { Plus, Calendar, Edit, Trash2, MapPin, Clock, Star, CheckCircle, Users, Phone, Mail, User, Sparkles } from 'lucide-react'
 import { Event } from '@/lib/types'
 import { getEvents, deleteEvent, toggleEventFeatured, toggleEventConfirmed } from '@/lib/actions/events'
 import { useTenant } from '@/contexts/tenant-context'
@@ -404,6 +404,53 @@ export default function EventsPage() {
                                 {tag}
                               </span>
                             ))}
+                          </div>
+                        )}
+
+                        {/* Service Package Information */}
+                        {event.eventServicePackage && (
+                          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <h4 className="text-sm font-medium text-blue-900 mb-2 flex items-center">
+                              <Sparkles className="h-4 w-4 mr-2" />
+                              Linked Service Package
+                            </h4>
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-blue-800">
+                                  {event.eventServicePackage.eventService?.name} - {event.eventServicePackage.name}
+                                </span>
+                                {event.eventServicePackage.price && event.eventServicePackage.price > 0 && (
+                                  <span className="text-sm font-semibold text-blue-900">
+                                    ₱{event.eventServicePackage.price.toLocaleString()}
+                                  </span>
+                                )}
+                              </div>
+                              {event.eventServicePackage.description && (
+                                <p className="text-xs text-blue-700">
+                                  {event.eventServicePackage.description}
+                                </p>
+                              )}
+                              {event.eventServicePackage.inclusions.length > 0 && (
+                                <div className="mt-2">
+                                  <p className="text-xs font-medium text-blue-800 mb-1">Inclusions:</p>
+                                  <div className="flex flex-wrap gap-1">
+                                    {event.eventServicePackage.inclusions.slice(0, 3).map((inclusion, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+                                      >
+                                        {inclusion}
+                                      </span>
+                                    ))}
+                                    {event.eventServicePackage.inclusions.length > 3 && (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                        +{event.eventServicePackage.inclusions.length - 3} more
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
