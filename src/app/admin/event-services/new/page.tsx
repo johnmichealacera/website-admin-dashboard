@@ -11,7 +11,6 @@ export default function NewEventServicePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (data: EventServiceFormData) => {
-    console.log('data', data)
     setIsSubmitting(true)
     try {
       const response = await createEventService(data)

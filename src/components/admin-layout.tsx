@@ -59,12 +59,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { user, error, isLoading } = useUser()
   const { currentSite, userSites, currentUser } = useTenant()
 
-  // Debug tenant context
-  console.log('🏗️ AdminLayout - Auth0 user:', user)
-  console.log('🏗️ AdminLayout - Current site:', currentSite)
-  console.log('🏗️ AdminLayout - User sites:', userSites)
-  console.log('🏗️ AdminLayout - Current user:', currentUser)
-
   // Show loading state
   if (isLoading) {
     return (
@@ -79,7 +73,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   // If Auth0 is not loading but user is still undefined, redirect to login
   if (!isLoading && !user) {
-    console.log('🔄 Redirecting to login - no Auth0 user found')
     window.location.href = '/api/auth/login'
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
