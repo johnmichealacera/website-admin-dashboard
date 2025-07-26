@@ -3,12 +3,25 @@
 import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
 import { EventService, EventServiceFormData, ApiResponse } from '@/lib/types'
+import { EventServicePackage } from '@/lib/types'
 
 export async function getEventServices(siteId: string): Promise<ApiResponse<EventService[]>> {
   try {
     const eventServices = await db.eventService.findMany({
       where: {
         siteId: siteId,
+      },
+      include: {
+        servicePackages: {
+          orderBy: [
+            {
+              sortOrder: 'asc',
+            },
+            {
+              name: 'asc',
+            },
+          ],
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -19,7 +32,11 @@ export async function getEventServices(siteId: string): Promise<ApiResponse<Even
       success: true,
       data: eventServices.map(service => ({
         ...service,
-        addOns: service.addOns ? JSON.parse(JSON.stringify(service.addOns)) : null
+        addOns: service.addOns ? JSON.parse(JSON.stringify(service.addOns)) : null,
+        servicePackages: service.servicePackages?.map((pkg) => ({
+          ...pkg,
+          addOns: pkg.addOns ? JSON.parse(JSON.stringify(pkg.addOns)) : null
+        })) || []
       })),
     }
   } catch (error) {
@@ -77,8 +94,6 @@ export async function getEventService(id: string, siteId: string): Promise<ApiRe
 
 export async function createEventService(data: EventServiceFormData): Promise<ApiResponse<EventService>> {
   try {
-    console.log('createEventService data', data)
-    
     // Extract packages data from the form data
     const { servicePackages, ...eventServiceData } = data
     
@@ -312,6 +327,54 @@ export async function getEventServicesStats(siteId: string) {
     return {
       success: false,
       error: 'Failed to fetch event services stats'
+    }
+  }
+} 
+
+export async function getEventServicePackages(siteId: string): Promise<ApiResponse<EventServicePackage[]>> {
+  try {
+    const packages = await db.eventServicePackage.findMany({
+      where: {
+        eventService: {
+          siteId: siteId,
+        },
+        isActive: true,
+      },
+      include: {
+        eventService: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: [
+        {
+          eventService: {
+            name: 'asc',
+          },
+        },
+        {
+          sortOrder: 'asc',
+        },
+        {
+          name: 'asc',
+        },
+      ],
+    })
+
+    return {
+      success: true,
+      data: packages.map(pkg => ({
+        ...pkg,
+        addOns: pkg.addOns ? JSON.parse(JSON.stringify(pkg.addOns)) : null
+      })),
+    }
+  } catch (error) {
+    console.error('Error fetching event service packages:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch event service packages',
     }
   }
 } 

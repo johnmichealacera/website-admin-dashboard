@@ -178,8 +178,10 @@ export interface Event {
   contactPhone: string | null
   contactName: string | null
   siteId: string
+  eventServicePackageId: string | null
   createdAt: Date
   updatedAt: Date
+  eventServicePackage?: EventServicePackage | null
 }
 
 export interface EventService {
@@ -219,6 +221,10 @@ export interface EventServicePackage {
   eventServiceId: string
   createdAt: Date
   updatedAt: Date
+  eventService?: {
+    id: string
+    name: string
+  }
 }
 
 export interface EventServiceAddOn {
@@ -253,7 +259,9 @@ export type AboutFormData = Omit<About, 'id' | 'createdAt' | 'updatedAt'>
 
 export type ContactFormData = Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>
 
-export type EventFormData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
+export type EventFormData = Omit<Event, 'id' | 'createdAt' | 'updatedAt' | 'eventServicePackage'> & {
+  eventServicePackageId?: string | null
+}
 
 export type EventServiceFormData = Omit<EventService, 'id' | 'createdAt' | 'updatedAt' | 'imageUrls' | 'servicePackages'> & {
   servicePackages?: Omit<EventServicePackage, 'id' | 'createdAt' | 'updatedAt' | 'eventServiceId'>[]

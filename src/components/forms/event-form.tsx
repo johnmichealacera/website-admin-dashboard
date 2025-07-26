@@ -1,14 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { EventFormData } from '@/lib/types'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { EventFormData, EventServicePackage } from '@/lib/types'
 import { createEvent, updateEvent } from '@/lib/actions/events'
+import { getEventServicePackages } from '@/lib/actions/event-services'
 import { Loader2, Calendar, MapPin, Upload, X } from 'lucide-react'
 import { uploadMultipleToCloudinary } from "@/lib/utils/cloudinary-upload";
 import { OptimizationStatus } from "@/components/ui/optimization-status";
@@ -26,6 +28,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
   const { currentSite } = useTenant()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [servicePackages, setServicePackages] = useState<EventServicePackage[]>([])
   const [formData, setFormData] = useState<EventFormData>({
     siteId: currentSite?.id || '',
     title: initialData?.title || '',
@@ -48,6 +51,7 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
     contactEmail: initialData?.contactEmail || '',
     contactPhone: initialData?.contactPhone || '',
     contactName: initialData?.contactName || '',
+    eventServicePackageId: initialData?.eventServicePackageId || null,
   })
 
   const [tagInput, setTagInput] = useState('')
@@ -56,6 +60,25 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
   const cloudinaryUrl = process.env.NEXT_PUBLIC_CLOUDINARY_URL
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
   const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY
+
+  useEffect(() => {
+    if (currentSite?.id) {
+      loadServicePackages()
+    }
+  }, [currentSite?.id])
+
+  const loadServicePackages = async () => {
+    if (!currentSite?.id) return
+    
+    try {
+      const response = await getEventServicePackages(currentSite.id)
+      if (response.success && response.data) {
+        setServicePackages(response.data)
+      }
+    } catch (error) {
+      console.error('Error loading service packages:', error)
+    }
+  }
 
   const formatDateTimeLocal = (date: Date | null) => {
     if (!date) return ''
@@ -212,6 +235,29 @@ export function EventForm({ initialData, eventId, onSuccess, onCancel }: EventFo
                 placeholder="Enter booking description"
                 rows={4}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="servicePackage">Service Package (Optional)</Label>
+              <Select 
+                value={formData.eventServicePackageId || undefined} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, eventServicePackageId: value || null }))}
+              >
+                <SelectTrigger id="servicePackage" className="w-full">
+                  <SelectValue placeholder="Select a service package (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {servicePackages.map((pkg) => (
+                    <SelectItem key={pkg.id} value={pkg.id}>
+                      {pkg.eventService?.name} - {pkg.name}
+                      {pkg.price && pkg.price > 0 && ` (₱${pkg.price.toLocaleString()})`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">
+                Link this booking to a specific service package for better organization
+              </p>
             </div>
           </div>
 

@@ -224,12 +224,13 @@ export default function EventServicesPage() {
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div>
+                      {/* TODO: Decide if we want to show the base price */}
+                      {/* <div>
                         <p className="text-sm font-medium text-gray-500">Base Price</p>
                         <p className="text-lg font-semibold text-gray-900">
                           {formatPrice(service.basePrice)}
                         </p>
-                      </div>
+                      </div> */}
                       
                       {service.duration && (
                         <div>
@@ -244,31 +245,110 @@ export default function EventServicesPage() {
                       </div>
                     </div>
 
+                    {/* Contact Information */}
+                    {(service.contactEmail || service.contactPhone || service.bookingUrl) && (
+                      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                        <p className="text-sm font-medium text-gray-700 mb-2">Contact Information:</p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                          {service.contactEmail && (
+                            <div className="flex items-center space-x-1">
+                              <span className="text-gray-500">Email:</span>
+                              <span className="text-gray-900">{service.contactEmail}</span>
+                            </div>
+                          )}
+                          {service.contactPhone && (
+                            <div className="flex items-center space-x-1">
+                              <span className="text-gray-500">Phone:</span>
+                              <span className="text-gray-900">{service.contactPhone}</span>
+                            </div>
+                          )}
+                          {service.bookingUrl && (
+                            <div className="flex items-center space-x-1">
+                              <span className="text-gray-500">Booking:</span>
+                              <a 
+                                href={service.bookingUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 underline"
+                              >
+                                Book Now
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Service Inclusions */}
+                    {service.inclusions.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-gray-500 mb-2">Service Inclusions:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {service.inclusions.slice(0, 4).map((inclusion, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {inclusion}
+                            </Badge>
+                          ))}
+                          {service.inclusions.length > 4 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{service.inclusions.length - 4} more
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Service Add-ons */}
+                    {service.addOns && service.addOns.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-gray-500 mb-2">Available Add-ons:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {service.addOns.slice(0, 3).map((addOn, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {addOn.name} ({formatPrice(addOn.price)})
+                            </Badge>
+                          ))}
+                          {service.addOns.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{service.addOns.length - 3} more
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Service Packages */}
                     {service.servicePackages && service.servicePackages.length > 0 && (
                       <div className="mb-4">
-                        <p className="text-sm font-medium text-gray-500 mb-2">Available Packages:</p>
-                        <div className="space-y-2">
+                        <p className="text-sm font-medium text-gray-500 mb-3">Available Packages:</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {service.servicePackages.map((pkg, index) => (
-                            <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                            <div key={index} className="border rounded-lg p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
                               <div className="flex items-center justify-between mb-2">
-                                <h4 className="font-medium text-gray-900">{pkg.name}</h4>
+                                <h4 className="font-semibold text-blue-900">{pkg.name}</h4>
+                                {pkg.price && pkg.price > 0 && (
+                                  <span className="text-sm font-bold text-blue-900">
+                                    {formatPrice(pkg.price)}
+                                  </span>
+                                )}
                               </div>
+                              
                               {pkg.description && (
-                                <p className="text-sm text-gray-600 mb-2">{pkg.description}</p>
+                                <p className="text-sm text-blue-700 mb-3">{pkg.description}</p>
                               )}
                               
                               {pkg.inclusions.length > 0 && (
                                 <div className="mb-2">
-                                  <p className="text-xs font-medium text-gray-500 mb-1">Inclusions:</p>
+                                  <p className="text-xs font-medium text-blue-800 mb-1">Inclusions:</p>
                                   <div className="flex flex-wrap gap-1">
-                                    {pkg.inclusions.slice(0, 2).map((inclusion, idx) => (
-                                      <Badge key={idx} variant="outline" className="text-xs">
+                                    {pkg.inclusions.slice(0, 3).map((inclusion, idx) => (
+                                      <Badge key={idx} variant="outline" className="text-xs bg-blue-100 text-blue-800 border-blue-300">
                                         {inclusion}
                                       </Badge>
                                     ))}
-                                    {pkg.inclusions.length > 2 && (
-                                      <Badge variant="outline" className="text-xs">
-                                        +{pkg.inclusions.length - 2} more
+                                    {pkg.inclusions.length > 3 && (
+                                      <Badge variant="outline" className="text-xs bg-blue-100 text-blue-800 border-blue-300">
+                                        +{pkg.inclusions.length - 3} more
                                       </Badge>
                                     )}
                                   </div>
@@ -277,15 +357,15 @@ export default function EventServicesPage() {
 
                               {pkg.addOns && pkg.addOns.length > 0 && (
                                 <div className="mb-2">
-                                  <p className="text-xs font-medium text-gray-500 mb-1">Add-ons:</p>
+                                  <p className="text-xs font-medium text-blue-800 mb-1">Add-ons:</p>
                                   <div className="flex flex-wrap gap-1">
                                     {pkg.addOns.slice(0, 2).map((addOn, idx) => (
-                                      <Badge key={idx} variant="outline" className="text-xs">
+                                      <Badge key={idx} variant="outline" className="text-xs bg-purple-100 text-purple-800 border-purple-300">
                                         {addOn.name}
                                       </Badge>
                                     ))}
                                     {pkg.addOns.length > 2 && (
-                                      <Badge variant="outline" className="text-xs">
+                                      <Badge variant="outline" className="text-xs bg-purple-100 text-purple-800 border-purple-300">
                                         +{pkg.addOns.length - 2} more
                                       </Badge>
                                     )}
@@ -295,15 +375,15 @@ export default function EventServicesPage() {
 
                               {pkg.freebies.length > 0 && (
                                 <div>
-                                  <p className="text-xs font-medium text-gray-500 mb-1">Freebies:</p>
+                                  <p className="text-xs font-medium text-blue-800 mb-1">Freebies:</p>
                                   <div className="flex flex-wrap gap-1">
                                     {pkg.freebies.slice(0, 2).map((freebie, idx) => (
-                                      <Badge key={idx} variant="outline" className="text-xs text-green-600 border-green-600">
+                                      <Badge key={idx} variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
                                         {freebie}
                                       </Badge>
                                     ))}
                                     {pkg.freebies.length > 2 && (
-                                      <Badge variant="outline" className="text-xs text-green-600 border-green-600">
+                                      <Badge variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
                                         +{pkg.freebies.length - 2} more
                                       </Badge>
                                     )}
@@ -316,20 +396,35 @@ export default function EventServicesPage() {
                       </div>
                     )}
 
+                    {/* Service Freebies */}
                     {service.freebies.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-500 mb-2">Freebies:</p>
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-gray-500 mb-2">Service Freebies:</p>
                         <div className="flex flex-wrap gap-1">
-                          {service.freebies.slice(0, 3).map((freebie, index) => (
-                            <Badge key={index} variant="outline" className="text-xs text-green-600 border-green-600">
+                          {service.freebies.slice(0, 4).map((freebie, index) => (
+                            <Badge key={index} variant="outline" className="text-xs text-green-600 border-green-600 bg-green-50">
                               {freebie}
                             </Badge>
                           ))}
-                          {service.freebies.length > 3 && (
-                            <Badge variant="outline" className="text-xs text-green-600 border-green-600">
-                              +{service.freebies.length - 3} more
+                          {service.freebies.length > 4 && (
+                            <Badge variant="outline" className="text-xs text-green-600 border-green-600 bg-green-50">
+                              +{service.freebies.length - 4} more
                             </Badge>
                           )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Service Tags */}
+                    {service.tags.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-gray-500 mb-2">Tags:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {service.tags.map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs bg-gray-100 text-gray-700 border-gray-300">
+                              {tag}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
                     )}

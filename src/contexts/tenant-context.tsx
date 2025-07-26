@@ -13,13 +13,8 @@ export function TenantProvider({ children }: TenantProviderProps) {
   const [currentSite, setCurrentSite] = useState<Site | null>(null)
   const [userSites, setUserSites] = useState<UserSite[]>([])
   const [currentUser, setCurrentUser] = useState<User | null>(null)
-
-  console.log('🔄 TenantProvider - Auth0 loading:', auth0Loading)
-  console.log('🔄 TenantProvider - Auth0 user:', auth0User)
-
   // Fetch user data and sites when Auth0 user is available
   useEffect(() => {
-    console.log('🔄 TenantProvider useEffect - Auth0 loading:', auth0Loading, 'Auth0 user:', !!auth0User)
     if (!auth0Loading && auth0User) {
       console.log('✅ TenantProvider - Calling fetchUserData')
       fetchUserData()
@@ -30,34 +25,24 @@ export function TenantProvider({ children }: TenantProviderProps) {
 
   const fetchUserData = async () => {
     try {
-      console.log('🔍 Fetching user data...')
       // Fetch current user and their sites
       const response = await fetch('/api/user/profile')
-      console.log('📡 API Response status:', response.status)
       
       if (response.ok) {
         const data = await response.json()
-        console.log('📊 API Response data:', data)
         
         setCurrentUser(data.user)
         setUserSites(data.sites)
         
-        console.log('👤 Current user:', data.user)
-        console.log('🏢 User sites:', data.sites)
-        
         // Auto-select first site or previously selected site from localStorage
         const savedSiteId = localStorage.getItem('selectedSiteId')
-        console.log('savedSiteId', savedSiteId)
 
         const siteToSelect = savedSiteId 
           ? data.sites.find((userSite: UserSite) => userSite.siteId === savedSiteId)?.site
           : data.sites[0]?.site
-
-        console.log('🎯 Site to select:', siteToSelect)
         
         if (siteToSelect) {
           setCurrentSite(siteToSelect)
-          console.log('✅ Current site set to:', siteToSelect)
         } else {
           console.log('❌ No site to select')
         }

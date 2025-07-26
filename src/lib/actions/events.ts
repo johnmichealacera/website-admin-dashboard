@@ -10,11 +10,30 @@ export async function getEvents(siteId: string): Promise<Event[]> {
       where: {
         siteId: siteId,
       },
+      include: {
+        eventServicePackage: {
+          include: {
+            eventService: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
       orderBy: {
         startDate: 'asc',
       },
     })
-    return events
+    
+    return events.map(event => ({
+      ...event,
+      eventServicePackage: event.eventServicePackage ? {
+        ...event.eventServicePackage,
+        addOns: event.eventServicePackage.addOns ? JSON.parse(JSON.stringify(event.eventServicePackage.addOns)) : null
+      } : null
+    })) as Event[]
   } catch (error) {
     console.error('Error fetching events:', error)
     return []
@@ -28,8 +47,29 @@ export async function getEventById(id: string, siteId: string): Promise<Event | 
         id: id,
         siteId: siteId,
       },
+      include: {
+        eventServicePackage: {
+          include: {
+            eventService: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
     })
-    return event
+    
+    if (!event) return null
+    
+    return {
+      ...event,
+      eventServicePackage: event.eventServicePackage ? {
+        ...event.eventServicePackage,
+        addOns: event.eventServicePackage.addOns ? JSON.parse(JSON.stringify(event.eventServicePackage.addOns)) : null
+      } : null
+    } as Event
   } catch (error) {
     console.error('Error fetching event:', error)
     return null
@@ -60,6 +100,7 @@ export async function createEvent(data: EventFormData, siteId: string): Promise<
         contactEmail: data.contactEmail,
         contactPhone: data.contactPhone,
         contactName: data.contactName,
+        eventServicePackageId: data.eventServicePackageId,
         siteId: siteId,
       },
     })
@@ -108,6 +149,7 @@ export async function updateEvent(id: string, data: Partial<EventFormData>, site
         ...(data.contactEmail !== undefined && { contactEmail: data.contactEmail }),
         ...(data.contactPhone !== undefined && { contactPhone: data.contactPhone }),
         ...(data.contactName !== undefined && { contactName: data.contactName }),
+        ...(data.eventServicePackageId !== undefined && { eventServicePackageId: data.eventServicePackageId }),
       },
     })
 

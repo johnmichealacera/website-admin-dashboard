@@ -173,18 +173,6 @@ export default function ClientSiteSettingsPage() {
     JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder) ||
     JSON.stringify(formData.colorPalette) !== JSON.stringify(siteSettings.colorPalette)
   )
-
-  // Debug logging (remove in production)
-  console.log('Site Settings Debug:', {
-    hasChanges,
-    nameChanged: siteSettings ? formData.name !== siteSettings.name : false,
-    featuresChanged: siteSettings ? JSON.stringify(formData.features.map(f => f.name).sort()) !== JSON.stringify(siteSettings.features.map(f => f.name).sort()) : false,
-    orderChanged: siteSettings ? JSON.stringify(formData.featuresOrder) !== JSON.stringify(siteSettings.featuresOrder) : false,
-    colorsChanged: siteSettings ? JSON.stringify(formData.colorPalette) !== JSON.stringify(siteSettings.colorPalette) : false,
-    remainingSlots,
-    canSave: !isSubmitting && formData.name.trim() !== '' && hasMinimumFeatures && hasChanges
-  })
-
   // Button should be enabled when:
   // 1. Not currently submitting
   // 2. Site name is not empty

@@ -4,19 +4,14 @@ import { db } from '@/lib/db'
 
 export async function GET() {
   try {
-    console.log('🔍 [API] Getting user profile...')
-    
     // Get the authenticated user session
     const session = await auth0.getSession()
     
     if (!session || !session.user) {
-      console.log('❌ [API] No session or user found')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const auth0UserId = session.user.sub
-    console.log('👤 [API] Auth0 User ID:', auth0UserId)
-
     // Find or create user in our database
     let user = await db.user.findUnique({
       where: { auth0UserId },
@@ -55,10 +50,6 @@ export async function GET() {
         }
       }
     })
-
-    console.log('🔍 [API] User found in database:', !!user)
-    console.log('🏢 [API] User sites count:', user?.sites?.length || 0)
-
     // If user doesn't exist in our database, create them
     if (!user) {
       user = await db.user.create({
@@ -160,9 +151,6 @@ export async function GET() {
       },
       sites: user.sites
     }
-
-    console.log('📤 [API] Returning user data:', responseData.user)
-    console.log('📤 [API] Returning sites data:', responseData.sites)
 
     return NextResponse.json(responseData)
 
