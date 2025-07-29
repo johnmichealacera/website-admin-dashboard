@@ -1,6 +1,6 @@
-# Multi-Tenant Business Admin Dashboard
+# Multi-Tenant Business Admin Dashboard v3.0.0
 
-A modern, full-stack multi-tenant admin dashboard for managing business inventory, categories, events, event services, and business information. Built with Next.js 14, TypeScript, Prisma, PostgreSQL, Auth0, and TailwindCSS.
+A modern, full-stack multi-tenant admin dashboard for managing business inventory, categories, events, services, gallery, testimonials, and business information. Built with Next.js 15, TypeScript, Prisma, PostgreSQL, Auth0, and TailwindCSS.
 
 ## 🚀 Features
 
@@ -8,7 +8,7 @@ A modern, full-stack multi-tenant admin dashboard for managing business inventor
 - **Multi-Tenant Architecture**: Support for multiple business sites with site-specific data isolation
 - **Auth0 Authentication**: Secure authentication with user management and role-based access control
 - **Site Package Management**: Different feature sets based on package types (Basic, Standard, Premium, Enterprise)
-- **Dynamic Dashboard**: Intelligent dashboard that adapts based on site features, showing relevant metrics for each package type
+- **Dynamic Dashboard**: Intelligent dashboard that adapts based on site features
 - **Responsive Design**: Mobile-friendly interface with modern UI
 - **Real-time Updates**: Server Actions for seamless data updates
 - **Type Safety**: Full TypeScript support throughout the application
@@ -18,10 +18,12 @@ A modern, full-stack multi-tenant admin dashboard for managing business inventor
 - **Category Management**: Organize products into categories with descriptions
 - **Event Management**: Create and manage business events with dates, locations, attendee limits, image galleries, and optional service package linking
 - **Event Services**: Comprehensive service package management with pricing, add-ons, and freebies
+- **Services Management**: Manage core business services (solar, CCTV, electrical, etc.) with categories and icons
+- **Gallery Management**: Showcase project photos and portfolio with tags and featured items
+- **Testimonials System**: Display client feedback and reviews with star ratings and avatars
 - **Business Information**: Update About Us and Contact information
 - **Logo Management**: Upload, replace, and remove site logos with Cloudinary integration
-- **Image Upload**: Cloudinary integration for product, event, and logo images with WebP optimization for better performance
-- **WebP Optimization**: Automatic client-side image conversion to WebP format for 25-50% smaller file sizes
+- **Image Upload**: Cloudinary integration for all images with WebP optimization for better performance
 
 ### Multi-Tenant Features
 - **Site Selector**: Users with access to multiple sites can switch between them
@@ -34,23 +36,18 @@ A modern, full-stack multi-tenant admin dashboard for managing business inventor
 
 ### Package Types & Features
 - **Basic Package**: Dashboard, Products, Categories
-- **Standard Package**: Dashboard, Products, Categories, Events
-- **Premium Package**: Dashboard, Products, Categories, Events, Event Services, About
-- **Enterprise Package**: Dashboard, Products, Categories, Events, Event Services, About, Contact
+- **Standard Package**: Dashboard, Products, Categories, Events, Services
+- **Premium Package**: Dashboard, Products, Categories, Events, Event Services, About, Services, Gallery
+- **Enterprise Package**: Dashboard, Products, Categories, Events, Event Services, About, Contact, Services, Gallery, Testimonials
 
 ### User Roles
-### Event Management Enhancements
-- **Service Package Linking**: Events can be optionally linked to specific service packages for better organization
-- **Comprehensive Package Display**: Rich display of package details including pricing, inclusions, add-ons, and freebies
-- **Enhanced Admin Dashboards**: Improved event services listing with complete package information
-- **Visual Improvements**: Color-coded sections, gradient backgrounds, and responsive design for better user experience
 - **Super Admin**: Full access to all sites and site settings management
 - **Admin**: Full access to assigned sites only
 - **Site-Specific Roles**: Users can have different roles per site
 
 ## 🛠 Tech Stack
 
-- **Frontend**: Next.js 14 (App Router), React 19, TypeScript
+- **Frontend**: Next.js 15 (App Router), React 19, TypeScript
 - **Styling**: TailwindCSS 4 with custom components
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Auth0 for secure user management
@@ -222,6 +219,39 @@ The application uses the following database models:
 - `siteId` - Foreign key to Site (multi-tenant)
 - `createdAt` / `updatedAt` - Timestamps
 
+#### Service
+- `id` - Unique identifier
+- `title` - Service title
+- `slug` - URL-friendly service slug
+- `description` - Service description
+- `category` - Service category (e.g., Electrical, Solar, CCTV)
+- `iconUrl` - Service icon URL (Cloudinary, optional)
+- `isFeatured` - Featured service flag
+- `siteId` - Foreign key to Site (multi-tenant)
+- `createdAt` / `updatedAt` - Timestamps
+
+#### GalleryItem
+- `id` - Unique identifier
+- `title` - Gallery item title (optional)
+- `imageUrl` - Image URL (Cloudinary)
+- `description` - Gallery item description (optional)
+- `projectDate` - Project completion date (optional)
+- `tags` - Array of tags for organization
+- `isFeatured` - Featured gallery item flag
+- `siteId` - Foreign key to Site (multi-tenant)
+- `createdAt` - Timestamp
+
+#### Testimonial
+- `id` - Unique identifier
+- `clientName` - Client name
+- `clientTitle` - Client title/role (optional)
+- `content` - Testimonial content
+- `rating` - Star rating (1-5, optional)
+- `avatarUrl` - Client avatar URL (Cloudinary, optional)
+- `projectId` - Linked project ID (optional)
+- `siteId` - Foreign key to Site (multi-tenant)
+- `createdAt` - Timestamp
+
 #### About
 - `id` - Unique identifier
 - `title` - About section title
@@ -239,7 +269,7 @@ The application uses the following database models:
 - `phone` - Phone number (optional)
 - `address` - Street address (optional)
 - `city` - City (optional)
-- `state` - State (optional)
+- `province` - Province/state (optional)
 - `zipCode` - ZIP code (optional)
 - `country` - Country (optional)
 - `socialLinks` - JSON object with social media links
@@ -266,9 +296,9 @@ The application uses the following database models:
 
 #### Dashboard
 - **Dynamic Metrics**: Automatically shows relevant statistics based on enabled site features
-- **Package-Aware Layout**: Displays first 4 features with color-coded metrics and icons
-- **Smart Adaptation**: Basic packages show focused metrics, Premium+ packages show additional feature sections
-- **Real-Time Data**: Live metrics for products, categories, events, event services, and configuration status
+- **Package-Aware Layout**: Displays features with color-coded metrics and icons
+- **Smart Adaptation**: Different packages show different feature sections
+- **Real-Time Data**: Live metrics for all business features
 - **Package Information**: Visual display of current package type and available features
 
 #### Product Management
@@ -287,13 +317,6 @@ The application uses the following database models:
 - Site-specific category management
 
 #### Event Management
-#### Event Management with Service Package Linking
-- **Link Events to Packages**: When creating or editing events, optionally select a service package from the dropdown
-- **View Linked Information**: Events with linked packages display comprehensive package details including pricing and inclusions
-- **Enhanced Organization**: Better organize your bookings by linking them to specific service packages
-- **Rich Package Display**: View service packages with detailed information including pricing, inclusions, add-ons, and freebies
-- **Contact Information**: Each service displays contact details and booking URLs
-- **Visual Organization**: Color-coded sections make it easy to scan and understand service offerings
 - Create events with comprehensive details and image galleries (max 3 images)
 - Edit existing events with date, location, and pricing management
 - Delete events (with confirmation)
@@ -314,6 +337,30 @@ The application uses the following database models:
 - Tag-based service organization
 - Site-specific service management
 
+#### Services Management
+- Create core business services with categories
+- Upload service icons with Cloudinary integration
+- Set featured services for homepage display
+- Automatic slug generation for SEO
+- Category-based organization (Electrical, Solar, CCTV, etc.)
+- Service descriptions and detailed information
+
+#### Gallery Management
+- Upload and manage project photos
+- Add tags for better organization
+- Set featured gallery items
+- Track project completion dates
+- Grid layout with image previews
+- Image optimization with WebP support
+
+#### Testimonials Management
+- Add client testimonials with star ratings
+- Upload client avatars
+- Link testimonials to specific projects
+- Professional testimonial display
+- Rating system (1-5 stars)
+- Client information management
+
 #### Business Information
 - Update About Us information including mission, vision, and values
 - Manage contact details and social media links
@@ -330,6 +377,9 @@ src/
 │   │   ├── categories/         # Category management
 │   │   ├── events/             # Event management
 │   │   ├── event-services/     # Event services management
+│   │   ├── services/           # Services management
+│   │   ├── gallery/            # Gallery management
+│   │   ├── testimonials/       # Testimonials management
 │   │   ├── about/              # About Us management
 │   │   ├── contact/            # Contact management
 │   │   └── settings/           # Site settings (Super Admin only)
@@ -400,6 +450,27 @@ The application uses Next.js Server Actions for data operations with multi-tenan
 - `deleteEventService(id, siteId)` - Delete event service with site validation
 - `toggleEventServiceStatus(id, siteId)` - Toggle service status with site validation
 
+### Service Actions
+- `getServices(siteId)` - Fetch site-specific services
+- `getService(id, siteId)` - Fetch single service with site validation
+- `createService(data, siteId)` - Create new service for specific site
+- `updateService(id, data, siteId)` - Update service with site validation
+- `deleteService(id, siteId)` - Delete service with site validation
+
+### Gallery Actions
+- `getGalleryItems(siteId)` - Fetch site-specific gallery items
+- `getGalleryItem(id, siteId)` - Fetch single gallery item with site validation
+- `createGalleryItem(data, siteId)` - Create new gallery item for specific site
+- `updateGalleryItem(id, data, siteId)` - Update gallery item with site validation
+- `deleteGalleryItem(id, siteId)` - Delete gallery item with site validation
+
+### Testimonial Actions
+- `getTestimonials(siteId)` - Fetch site-specific testimonials
+- `getTestimonial(id, siteId)` - Fetch single testimonial with site validation
+- `createTestimonial(data, siteId)` - Create new testimonial for specific site
+- `updateTestimonial(id, data, siteId)` - Update testimonial with site validation
+- `deleteTestimonial(id, siteId)` - Delete testimonial with site validation
+
 ### About Actions
 - `getAbout(siteId)` - Fetch site-specific about information
 - `createOrUpdateAbout(data, siteId)` - Create or update about information for specific site
@@ -432,6 +503,9 @@ The application uses Next.js Server Actions for data operations with multi-tenan
 - `CategoryForm` - Category creation/editing form
 - `EventForm` - Event creation/editing form with image gallery (max 3 images)
 - `EventServiceForm` - Event service creation/editing form with pricing management
+- `ServiceForm` - Service creation/editing form with icon upload
+- `GalleryForm` - Gallery item creation/editing form with image upload
+- `TestimonialForm` - Testimonial creation/editing form with rating system
 - `AboutForm` - About Us information form
 - `ContactForm` - Contact information form
 
@@ -457,6 +531,9 @@ This creates:
 - **Sample products** with realistic data and images
 - **Sample events** with dates, locations, and pricing
 - **Sample event services** with detailed pricing and inclusions
+- **Sample services** with categories and icons
+- **Sample gallery items** with images and tags
+- **Sample testimonials** with ratings and avatars
 - **Sample business information** (About Us, Contact)
 - **Demo users** with different access levels and site assignments
 
@@ -637,6 +714,7 @@ Built with ❤️ for multi-tenant business management
 
 ## 📋 Version History
 
+- **v3.0.0** - Services, Gallery & Testimonials Management
 - **v2.2.0** - Event Service Package Relations & Enhanced Admin Dashboards
 - **v2.1.0** - Dynamic Dashboard & Package-Based Features
 - **v2.0.0** - Event Image Upload & Enhanced Forms
@@ -649,16 +727,10 @@ Built with ❤️ for multi-tenant business management
 
 ## 🆕 Recent Updates
 
-### Latest Changes
-- **Event Service Package Relations**: Optional linking between events and service packages for better organization
-- **Enhanced Event Services Dashboard**: Comprehensive package display with pricing, inclusions, and add-ons
-- **Improved Visual Design**: Color-coded sections and responsive design for better user experience
-- **Database Relations**: Proper event-service-package relationships with non-destructive migrations
-- **Image Upload for Events**: Added Cloudinary integration for event images with a maximum of 3 images per event
-- **Enhanced Event Form**: Improved event creation/editing form with image gallery support
-- **Multi-Tenant Architecture**: Complete implementation of multi-tenant system with site isolation
-- **Auth0 Integration**: Secure authentication with user management and role-based access
-- **Event Services**: Comprehensive service package management with pricing and add-ons
-- **Site Package System**: Different feature sets based on package types
-- **Responsive Design**: Enhanced mobile and tablet support
-- **Database Optimization**: Improved queries and relationships for better performance
+### Latest Changes (v3.0.0)
+- **Services Management**: Complete CRUD operations for business services with categories and icons
+- **Gallery Management**: Full gallery system with image upload, tags, and featured items
+- **Testimonials System**: Client feedback management with star ratings and avatars
+- **Enhanced Admin Interface**: Updated navigation, automatic updates, and improved UX
+- **Package System Updates**: New features added to STANDARD, PREMIUM, and ENTERPRISE packages
+- **Technical Improvements**: Better error handling, performance optimizations, and security enhancements

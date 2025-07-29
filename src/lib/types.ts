@@ -46,7 +46,10 @@ export enum SiteFeature {
   EVENTS = 'EVENTS',
   EVENT_SERVICES = 'EVENT_SERVICES',
   ABOUT = 'ABOUT',
-  CONTACT = 'CONTACT'
+  CONTACT = 'CONTACT',
+  SERVICES = 'SERVICES',
+  GALLERY = 'GALLERY',
+  TESTIMONIALS = 'TESTIMONIALS'
 }
 
 // Hero model type
@@ -305,6 +308,7 @@ export interface TenantContext {
   userSites: UserSite[]
   currentUser: User | null
   switchSite: (siteId: string) => void
+  refreshCurrentSite: () => Promise<void>
 }
 
 // Site package form data types
@@ -347,4 +351,49 @@ export interface DashboardStats {
 } 
 
 // Temporary alias for feature name type
+// Service types
+export interface Service {
+  id: string
+  title: string
+  slug: string
+  description: string
+  category: string | null
+  iconUrl: string | null
+  isFeatured: boolean
+  siteId: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Gallery types
+export interface GalleryItem {
+  id: string
+  title: string | null
+  imageUrl: string
+  description: string | null
+  projectDate: Date | null
+  tags: string[]
+  isFeatured: boolean
+  siteId: string
+  createdAt: Date
+}
+
+// Testimonial types
+export interface Testimonial {
+  id: string
+  clientName: string
+  clientTitle: string | null
+  content: string
+  rating: number | null
+  avatarUrl: string | null
+  projectId: string | null
+  siteId: string
+  createdAt: Date
+}
+
+// Form types
+export type ServiceFormData = Omit<Service, 'id' | 'createdAt' | 'updatedAt'>
+export type GalleryItemFormData = Omit<GalleryItem, 'id' | 'createdAt'>
+export type TestimonialFormData = Omit<Testimonial, 'id' | 'createdAt'>
+
 export type FeatureName = SiteFeature; 
