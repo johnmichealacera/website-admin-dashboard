@@ -4,15 +4,16 @@ import { auth0 } from '@/lib/auth0'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const session = await auth0.getSession()
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const siteId = params.id
+    const siteId = id
 
     const site = await db.site.findUnique({
       where: { id: siteId },
