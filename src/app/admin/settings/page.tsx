@@ -17,7 +17,7 @@ import { OptimizationStatus } from "@/components/ui/optimization-status";
 import Image from 'next/image'
 
 export default function SiteSettingsPage() {
-  const { currentUser, currentSite } = useTenant()
+  const { currentUser, currentSite, refreshCurrentSite } = useTenant()
   const [allSites, setAllSites] = useState<SitePackageInfo[]>([])
   const [selectedSite, setSelectedSite] = useState<SitePackageInfo | null>(null)
   const [formData, setFormData] = useState<SitePackageFormData>({
@@ -205,6 +205,11 @@ export default function SiteSettingsPage() {
       
       // Refresh all sites list
       loadAllSites()
+      
+      // If the updated site is the current site, refresh the current site data
+      if (currentSite?.id === selectedSite.id) {
+        await refreshCurrentSite()
+      }
     } else {
       setError(packageResult.error || analyticsResult.error || 'Failed to update site settings')
     }

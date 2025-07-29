@@ -21,7 +21,10 @@ import {
   LogOut,
   User,
   Settings,
-  Image
+  Image,
+  Wrench,
+  Camera,
+  MessageSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SiteSelector } from '@/components/site-selector'
@@ -47,6 +50,9 @@ const navItems: NavItem[] = [
   { href: '/admin/categories', icon: Tags, label: 'Categories', feature: SiteFeature.CATEGORIES },
   { href: '/admin/events', icon: Calendar, label: 'Bookings', feature: SiteFeature.EVENTS },
   { href: '/admin/event-services', icon: Sparkles, label: 'Event Services', feature: SiteFeature.EVENT_SERVICES },
+  { href: '/admin/services', icon: Wrench, label: 'Services', feature: SiteFeature.SERVICES },
+  { href: '/admin/gallery', icon: Camera, label: 'Gallery', feature: SiteFeature.GALLERY },
+  { href: '/admin/testimonials', icon: MessageSquare, label: 'Testimonials', feature: SiteFeature.TESTIMONIALS },
   { href: '/admin/about', icon: FileText, label: 'About Us', feature: SiteFeature.ABOUT },
   { href: '/admin/contact', icon: Phone, label: 'Contact Info', feature: SiteFeature.CONTACT },
   { href: '/admin/site-settings', icon: Settings, label: 'Site Settings', feature: null, regularAdminAccess: true },
@@ -193,7 +199,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:translate-x-0',
+          'fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -224,8 +230,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <SiteSelector />
         </div>
 
-        <nav className="mt-4">
-          <div className="space-y-1 px-3">
+        <nav className="flex-1 overflow-y-auto">
+          <div className="space-y-1 px-3 py-4">
             {sortedNavItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
@@ -242,10 +248,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   )}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon className="h-5 w-5" />
-                  <span>{item.label}</span>
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <span className="truncate">{item.label}</span>
                   {item.superAdminOnly && (
-                    <span className="ml-auto text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                    <span className="ml-auto text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded flex-shrink-0">
                       Super Admin
                     </span>
                   )}
@@ -256,7 +262,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         {/* User info and logout */}
-        <div className="absolute bottom-0 w-full p-4 border-t">
+        <div className="p-4 border-t bg-white">
           <div className="flex items-center space-x-3 mb-3">
             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
               <User className="h-4 w-4 text-white" />

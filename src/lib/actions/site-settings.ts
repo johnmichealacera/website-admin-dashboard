@@ -126,8 +126,8 @@ export async function updateClientSiteSettings(data: ClientSiteUpdateData) {
     const packageLimits = {
       BASIC: { min: 1, max: 3 },
       STANDARD: { min: 4, max: 6 },
-      PREMIUM: { min: 4, max: 6 },
-      ENTERPRISE: { min: 1, max: 6 }
+      PREMIUM: { min: 4, max: 8 },
+      ENTERPRISE: { min: 1, max: 9 }
     };
     const limits = packageLimits[currentSite.packageType as keyof typeof packageLimits];
     const nonDashboardFeatures = data.features.filter(f => f.name !== 'DASHBOARD');

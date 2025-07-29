@@ -21,18 +21,21 @@ const AVAILABLE_FEATURES = [
   { feature: SiteFeature.EVENT_SERVICES, label: 'Event Services', description: 'Manage service packages and pricing' },
   { feature: SiteFeature.ABOUT, label: 'About Us', description: 'Manage company information' },
   { feature: SiteFeature.CONTACT, label: 'Contact Info', description: 'Manage contact details and social links' },
+  { feature: SiteFeature.SERVICES, label: 'Services', description: 'Manage core business services (solar, CCTV, etc.)' },
+  { feature: SiteFeature.GALLERY, label: 'Gallery', description: 'Showcase project photos and portfolio' },
+  { feature: SiteFeature.TESTIMONIALS, label: 'Testimonials', description: 'Display client feedback and reviews' },
 ]
 
 // Package-based feature limits (excluding DASHBOARD which is always included)
 const PACKAGE_FEATURE_LIMITS = {
   [SitePackage.BASIC]: { min: 1, max: 3 },
   [SitePackage.STANDARD]: { min: 4, max: 6 },
-  [SitePackage.PREMIUM]: { min: 4, max: 6 },
-  [SitePackage.ENTERPRISE]: { min: 1, max: 6 } // No real limit for enterprise
+  [SitePackage.PREMIUM]: { min: 4, max: 8 },
+  [SitePackage.ENTERPRISE]: { min: 1, max: 9 } // No real limit for enterprise
 }
 
 export default function ClientSiteSettingsPage() {
-  const { currentSite } = useTenant()
+  const { currentSite, refreshCurrentSite } = useTenant()
   const [siteSettings, setSiteSettings] = useState<ClientSiteSettingsData | null>(null)
   const [sitePackage, setSitePackage] = useState<SitePackage>(SitePackage.BASIC)
   // Update formData and siteSettings to use array of { name, description } objects
@@ -148,7 +151,8 @@ export default function ClientSiteSettingsPage() {
     if (result.success) {
       setSuccess('Site settings updated successfully!')
       setSiteSettings(formData)
-      // The navigation will update automatically due to revalidatePath in the action
+      // Refresh the current site data to update the sidebar navigation
+      await refreshCurrentSite()
       setTimeout(() => setSuccess(null), 3000)
     } else {
       setError(result.error || 'Failed to update site settings')
