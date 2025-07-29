@@ -63,11 +63,26 @@ export function TenantProvider({ children }: TenantProviderProps) {
     }
   }
 
+  const refreshCurrentSite = async () => {
+    if (currentSite?.id) {
+      try {
+        const response = await fetch(`/api/sites/${currentSite.id}`)
+        if (response.ok) {
+          const updatedSite = await response.json()
+          setCurrentSite(updatedSite)
+        }
+      } catch (error) {
+        console.error('Error refreshing current site:', error)
+      }
+    }
+  }
+
   const contextValue: TenantContext = {
     currentSite,
     userSites,
     currentUser,
-    switchSite
+    switchSite,
+    refreshCurrentSite
   }
 
   return (
